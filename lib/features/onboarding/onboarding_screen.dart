@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mediconnect/features/login/login_screen.dart';
+import 'package:mediconnect/features/registration/registration_step1.dart';
 
 import 'onboarding_content.dart';
 import 'onboarding_data.dart';
@@ -78,7 +80,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       onPressed: () {
-                        // Navigate to Sign In screen
+                                               Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginScreen()),
+                        );
                       },
                       child: const Text(
                         "Sign In",
@@ -104,7 +110,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                       ),
                       onPressed: () {
-                        // Navigate to Sign Up screen
+                       Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const RegistrationStep1()),
+                        );
                       },
                       child: const Text(
                         "Sign Up",
