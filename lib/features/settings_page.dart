@@ -1,18 +1,64 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mediconnect/features/health_record_screen.dart';
 import 'edit_profile_screen.dart';
 
-class SettingsPage extends StatelessWidget {
-  final String fullName;
-  final String email;
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
 
-  const SettingsPage({
-    super.key,
-    this.fullName = 'Hairul Hazwan Ismail',
-    this.email = 'hairulhazwan87@gmail.com',
-  });
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  String fullName = '';
+  String email = '';
+  String? profileImageUrl;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final data = userDoc.data();
+
+      if (data != null) {
+        setState(() {
+          fullName = data['fullName'] ?? '';
+          email = data['email'] ?? '';
+          profileImageUrl = data.containsKey('profileImageUrl') ? data['profileImageUrl'] : null;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+  }
+
+  Future<void> _navigateToEditProfile() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+    );
+    // Refresh data after return
+    _loadUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -23,13 +69,16 @@ class SettingsPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         child: Column(
           children: [
-            // Profile picture & info
             Column(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 40,
+                  backgroundImage:
+                      profileImageUrl != null ? NetworkImage(profileImageUrl!) : null,
+                  child: profileImageUrl == null
+                      ? const Icon(Icons.person, size: 50, color: Colors.white)
+                      : null,
                   backgroundColor: Colors.blueAccent,
-                  child: Icon(Icons.person, size: 50, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -41,36 +90,32 @@ class SettingsPage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
 
-            // Settings options
             SettingsTile(
               icon: Icons.person_outline,
               title: "Profile Information",
               subtitle: "View and update your personal details",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-                );
-              },
+              onTap: _navigateToEditProfile,
             ),
             const SizedBox(height: 12),
             SettingsTile(
               icon: Icons.lock_outline,
               title: "Change Password",
               subtitle: "Securely update your account password",
-              onTap: () {
-                // Navigate to change password screen (to be created)
-              },
+              onTap: () {},
             ),
             const SizedBox(height: 12),
-            SettingsTile(
-              icon: Icons.app_registration_outlined,
-              title: "Registration",
-              subtitle: "Register your aqua farms, ponds and sensors",
-              onTap: () {
-                // Navigate to registration related page
-              },
-            ),
+SettingsTile(
+  icon: Icons.health_and_safety_outlined,
+  title: "Health Record",
+  subtitle: "Manage your medical information",
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const HealthRecordScreen()),
+    );
+  },
+),
+
           ],
         ),
       ),

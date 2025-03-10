@@ -43,7 +43,7 @@ class _MainAppScreenState extends State<MainAppScreen> {
             const SearchPage(),
             const AppointmentPage(),
             const ChatBotPage(),
-            SettingsPage(fullName: fullName, email: email),
+            const SettingsPage(),
           ];
         });
       }
