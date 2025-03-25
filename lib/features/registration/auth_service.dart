@@ -60,6 +60,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  
 
   Future<bool> registerUser(
     String email,
@@ -107,6 +108,28 @@ class AuthService {
     } catch (e) {
       print("Login error: $e");
       return null;
+    }
+  }
+
+  // Future<bool> resetPassword(String email) async {
+  //   try {
+  //     // Simulate sending a reset password email (replace with Firebase/Auth API)
+  //     await Future.delayed(const Duration(seconds: 2));
+  //     print("Password reset email sent to $email");
+  //     return true; // Simulate success
+  //   } catch (e) {
+  //     print("Error sending password reset email: $e");
+  //     return false; // Simulate failure
+  //   }
+  // }
+
+  Future<bool> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      return true;
+    } catch (e) {
+      print("Error: $e");
+      return false;
     }
   }
 }

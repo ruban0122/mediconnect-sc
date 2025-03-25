@@ -177,33 +177,47 @@ class _RegistrationStep2State extends State<RegistrationStep2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Registration',
+          style: TextStyle(
+            color: Color(0xFF2B479A),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.white,
+      ),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back),
-                  ),
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        "Registration",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color(0xFF1E3C8D),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
-              ),
+              // Row(
+              //   children: [
+              //     IconButton(
+              //       onPressed: () => Navigator.pop(context),
+              //       icon: const Icon(Icons.arrow_back),
+              //     ),
+              //     const Expanded(
+              //       child: Center(
+              //         child: Text(
+              //           "Registration",
+              //           style: TextStyle(
+              //             fontSize: 18,
+              //             color: Color(0xFF1E3C8D),
+              //             fontWeight: FontWeight.w600,
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(width: 48),
+              //   ],
+              // ),
               const SizedBox(height: 16),
               const Center(
                 child: Column(
@@ -310,7 +324,7 @@ class _RegistrationStep2State extends State<RegistrationStep2> {
                     value: _isAgreed,
                     onChanged: (value) => setState(() => _isAgreed = value!),
                   ),
-                  const Text("Agree to Terms & Conditions"),
+                  const Text(" I Agree to Terms & Conditions"),
                 ],
               ),
               const SizedBox(height: 30),
