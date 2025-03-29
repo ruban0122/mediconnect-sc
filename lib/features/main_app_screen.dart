@@ -6,7 +6,7 @@ import 'package:mediconnect/features/login/home_page.dart';
 import 'search_page.dart';
 import 'appointment_page.dart';
 import 'chatbot_page.dart';
-import 'settings_page.dart';
+import 'settingsScreen/settings_page.dart';
 
 class MainAppScreen extends StatefulWidget {
   const MainAppScreen({super.key});
@@ -43,7 +43,7 @@ class _MainAppScreenState extends State<MainAppScreen> {
             const SearchPage(),
             const AppointmentPage(),
             const ChatBotPage(),
-            const SettingsPage(),
+            const ProfilePage(),
           ];
         });
       }
