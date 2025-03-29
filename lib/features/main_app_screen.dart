@@ -1,21 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:mediconnect/features/login/home_page.dart';
+
 import 'search_page.dart';
 import 'appointment_page.dart';
 import 'chatbot_page.dart';
 import 'settingsScreen/settings_page.dart';
 
-class MainAppScreen extends StatefulWidget {
-  const MainAppScreen({super.key});
+class HomePageScreen extends StatefulWidget {
+  const HomePageScreen({super.key});
 
   @override
-  State<MainAppScreen> createState() => _MainAppScreenState();
+  State<HomePageScreen> createState() => _HomePageScreenState();
 }
 
-class _MainAppScreenState extends State<MainAppScreen> {
+class _HomePageScreenState extends State<HomePageScreen> {
   int _currentIndex = 0;
   String fullName = '';
   String email = '';
@@ -33,7 +33,8 @@ class _MainAppScreenState extends State<MainAppScreen> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid != null) {
-        final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+        final doc =
+            await FirebaseFirestore.instance.collection('users').doc(uid).get();
         setState(() {
           fullName = doc['fullName'] ?? '';
           email = doc['email'] ?? '';
@@ -71,9 +72,12 @@ class _MainAppScreenState extends State<MainAppScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Appointment'),
-          BottomNavigationBarItem(icon: Icon(Icons.smart_toy_outlined), label: 'AI Chatbot'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today), label: 'Appointment'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.smart_toy_outlined), label: 'AI Chatbot'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: 'Settings'),
         ],
       ),
     );

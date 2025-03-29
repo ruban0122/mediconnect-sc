@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mediconnect/features/registration/auth_service.dart';
 import 'package:mediconnect/features/settingsScreen/HealthRecordScreen.dart';
 import 'package:mediconnect/features/settingsScreen/MedicalInfoScreen.dart';
 import 'package:mediconnect/features/settingsScreen/account_settings_page.dart';
 import 'package:mediconnect/features/settingsScreen/health_record_screen.dart';
+import 'package:provider/provider.dart';
 import 'edit_profile_screen.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -80,15 +82,17 @@ class _ProfilePageState extends State<ProfilePage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.black),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app, color: Colors.black),
-            onPressed: () {
-              // Logout or any other action
+            onPressed: () async {
+              final authService =
+                  Provider.of<AuthService>(context, listen: false);
+              await authService.signOut();
             },
           ),
         ],
