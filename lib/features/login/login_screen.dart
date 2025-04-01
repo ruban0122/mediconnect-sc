@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (accountType == 'doctor') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const DoctorHomePage()),
+          MaterialPageRoute(builder: (_) => const DocHomePage()),
         );
       } else {
         Navigator.pushReplacement(
