@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mediconnect/features/appointment/appointment_page.dart';
 import 'package:mediconnect/features/login/home_page.dart';
 
 import 'search_page.dart';
-import 'appointment_page.dart';
+
 import 'chatbot_page.dart';
 import 'settingsScreen/settings_page.dart';
 
@@ -42,6 +43,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
           _pages = [
             HomePage(fullName: fullName),
             const SearchPage(),
+            // const BookAppointmentScreen(),
+            // const AppointmentListScreen(),
             const AppointmentPage(),
             const ChatBotPage(),
             const ProfilePage(),
