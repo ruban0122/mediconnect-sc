@@ -64,6 +64,7 @@ class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
         'method': widget.appointmentMethod,
         'price': widget.appointmentPrice,
         'createdAt': FieldValue.serverTimestamp(),
+        'doctorName': widget.doctorName,
       });
 
       Navigator.pushReplacement(
