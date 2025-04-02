@@ -7,6 +7,7 @@ class BookingSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -27,17 +28,30 @@ class BookingSuccessScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
               const SizedBox(height: 30),
-              
+
               // ✅ Continue Button
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushAndRemoveUntil(
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AppointmentPage()),
-                    (route) => false,
+                    MaterialPageRoute(
+                        builder: (context) => const AppointmentPage()),
+                    // (route) => false,
                   );
                 },
-                child: const Text("Continue"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2B479A),
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text(
+                  "Continue",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               ),
             ],
           ),
