@@ -8,12 +8,16 @@ class ConfirmAppointmentScreen extends StatefulWidget {
   final String doctorId;
   final DateTime selectedDate;
   final TimeOfDay selectedTime;
+  final String appointmentMethod;
+  final String appointmentPrice;
 
   const ConfirmAppointmentScreen({
     super.key,
     required this.doctorId,
     required this.selectedDate,
     required this.selectedTime,
+    required this.appointmentMethod,
+    required this.appointmentPrice,
   });
 
   @override
@@ -41,7 +45,7 @@ class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
       if (doctorDoc.exists) {
         setState(() {
           doctorName = doctorDoc['fullName'] ?? "Unknown Doctor";
-          doctorSpecialty = doctorDoc['specialty'] ?? "General";
+          doctorSpecialty = doctorDoc['specialization'] ?? "General";
         });
       }
     } catch (e) {
@@ -65,11 +69,17 @@ class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
         widget.selectedTime.minute,
       );
 
-      await FirebaseFirestore.instance.collection('appointments').add({
+      String appointmentId = "$userId-${DateTime.now().millisecondsSinceEpoch}";
+      await FirebaseFirestore.instance
+          .collection('appointments')
+          .doc(appointmentId)
+          .set({
         'patientId': userId,
         'doctorId': widget.doctorId,
         'dateTime': appointmentDateTime.toUtc(),
         'status': 'pending',
+        'method': widget.appointmentMethod,
+        'price': widget.appointmentPrice,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
@@ -91,6 +101,21 @@ class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
     }
   }
 
+  String _getMethodDescription() {
+    switch (widget.appointmentMethod) {
+      case 'messaging':
+        return 'Messaging Appointment';
+      case 'voice_call':
+        return 'Voice Call Appointment';
+      case 'video_call':
+        return 'Video Call Appointment';
+      case 'in_person':
+        return 'In-Person Visit';
+      default:
+        return 'Appointment';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,31 +125,104 @@ class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Doctor Info
             Text("Doctor: $doctorName",
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Text("Specialty: $doctorSpecialty",
                 style: const TextStyle(fontSize: 16, color: Colors.grey)),
             const SizedBox(height: 16),
-
-            Text(
-              "Date: ${DateFormat('yyyy-MM-dd').format(widget.selectedDate)}",
-              style: const TextStyle(fontSize: 16),
+            
+            // Appointment Details Card
+            Card(
+              elevation: 2,
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Date and Time
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_today, size: 20, color: Colors.blue),
+                        const SizedBox(width: 8),
+                        Text(
+                          DateFormat('EEE, MMM d, y').format(widget.selectedDate),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time, size: 20, color: Colors.blue),
+                        const SizedBox(width: 8),
+                        Text(
+                          widget.selectedTime.format(context),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 24),
+                    
+                    // Appointment Method
+                    Row(
+                      children: [
+                        const Icon(Icons.medical_services, size: 20, color: Colors.blue),
+                        const SizedBox(width: 8),
+                        Text(
+                          _getMethodDescription(),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.attach_money, size: 20, color: Colors.blue),
+                        const SizedBox(width: 8),
+                        Text(
+                          widget.appointmentPrice,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
-            Text(
-              "Time: ${widget.selectedTime.format(context)}",
-              style: const TextStyle(fontSize: 16),
+            
+            const Spacer(),
+            
+            // Total Price
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Total:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(widget.appointmentPrice, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
             ),
-
-            const SizedBox(height: 32),
-
-            // ✅ Confirmation Button
-            Center(
+            
+            // Confirm Button
+            SizedBox(
+              width: double.infinity,
               child: isLoading
-                  ? const CircularProgressIndicator()
+                  ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
                       onPressed: _confirmBooking,
-                      child: const Text("Confirm Booking"),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        "Confirm Booking",
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
             ),
           ],

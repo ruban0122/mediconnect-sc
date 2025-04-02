@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mediconnect/notification_service.dart';
 
 class DoctorAppointmentDetailScreen extends StatelessWidget {
   final String appointmentId;
@@ -74,15 +75,38 @@ class DoctorAppointmentDetailScreen extends StatelessWidget {
     );
   }
 
-  void _updateAppointmentStatus(BuildContext context, String appointmentId, String newStatus) async {
-    await FirebaseFirestore.instance.collection('appointments').doc(appointmentId).update({
+void _updateAppointmentStatus(BuildContext context, String appointmentId, String newStatus) async {
+  final appointmentDoc = await FirebaseFirestore.instance
+      .collection('appointments')
+      .doc(appointmentId)
+      .get();
+  
+  final patientId = appointmentDoc['patientId'];
+  
+  // Update status
+  await FirebaseFirestore.instance
+      .collection('appointments')
+      .doc(appointmentId)
+      .update({
+    'status': newStatus,
+  });
+
+  // Send notification to patient
+  await NotificationService.sendNotificationToUser(
+    userId: patientId,
+    title: 'Appointment Status Updated',
+    body: 'Your appointment status is now: ${newStatus.toUpperCase()}',
+    data: {
+      'type': 'appointment_status',
+      'appointmentId': appointmentId,
       'status': newStatus,
-    });
+    },
+  );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Appointment marked as $newStatus")),
-    );
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text("Appointment marked as $newStatus")),
+  );
 
-    Navigator.pop(context);
-  }
+  Navigator.pop(context);
+}
 }

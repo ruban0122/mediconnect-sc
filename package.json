@@ -1,0 +1,27 @@
+{
+  "name": "mediconnect",
+  "version": "1.0.0",
+  "description": "A new Flutter project.",
+  "homepage": "https://github.com/ruban2201/mediconnect#readme",
+  "bugs": {
+    "url": "https://github.com/ruban2201/mediconnect/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ruban2201/mediconnect.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "mediconnect": "file:"
+  }
+}

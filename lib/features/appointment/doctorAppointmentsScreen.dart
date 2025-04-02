@@ -46,7 +46,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
           .collection('appointments')
           .where('doctorId', isEqualTo: _auth.currentUser!.uid)
           .where('status', whereIn: statusFilter)
-          //.orderBy('dateTime', descending: false)
+          .orderBy('dateTime', descending: false)
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
