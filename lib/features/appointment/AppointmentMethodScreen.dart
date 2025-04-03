@@ -49,9 +49,17 @@ class _AppointmentMethodScreenState extends State<AppointmentMethodScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Book Appointment"),
-        backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Book Appointment',
+          style: TextStyle(
+            color: Color(0xFF2B479A),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),

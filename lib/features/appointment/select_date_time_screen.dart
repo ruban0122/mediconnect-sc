@@ -1,7 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mediconnect/features/appointment/AppointmentMethodScreen.dart';
-import 'package:mediconnect/features/appointment/confirm_appointment_screen.dart';
 
 class SelectDateTimeScreen extends StatefulWidget {
   final String doctorId;
@@ -26,15 +26,51 @@ class SelectDateTimeScreen extends StatefulWidget {
 class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
   DateTime selectedDate = DateTime.now();
   TimeOfDay? selectedTime;
+  Set<String> bookedSlots = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBookedSlots();
+  }
+
+  Future<void> _fetchBookedSlots() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('appointments')
+        .where('doctorId', isEqualTo: widget.doctorId)
+        .where('dateTime',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
+                selectedDate.year, selectedDate.month, selectedDate.day)))
+        .where('dateTime',
+            isLessThan: Timestamp.fromDate(DateTime(
+                selectedDate.year, selectedDate.month, selectedDate.day + 1)))
+        .get();
+
+    setState(() {
+      bookedSlots = querySnapshot.docs
+          .map((doc) => DateFormat('h:mm a')
+              .format((doc['dateTime'] as Timestamp).toDate()))
+          .toSet();
+      selectedTime = null; // Reset time selection when changing date
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Book Appointment"),
-        backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Book Appointment',
+          style: TextStyle(
+            color: Color(0xFF2B479A),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -43,55 +79,27 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          // Added SingleChildScrollView here
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 🩺 Doctor Profile
               _buildDoctorProfile(),
-
               const SizedBox(height: 20),
-
-              // 📅 Date Selection
-              const Text(
-                "Book Appointment",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 110, 96, 96)),
-              ),
-
+              const Text("Book Appointment",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 110, 96, 96))),
               const SizedBox(height: 10),
-              // 📅 Date Selection
-              const Text(
-                "Date",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-
+              const Text("Date",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
-
               _buildDateSelector(),
-
               const SizedBox(height: 20),
-
-              // ⏰ Time Selection
-              const Text(
-                "Time",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-
+              const Text("Time",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
-
               _buildTimeSelector(),
-
               const SizedBox(height: 15),
-
-              // 🛠 Custom Schedule Option
-              //  _buildCustomScheduleOption(),
-
-              // Removed Spacer() here for better control
-              const SizedBox(height: 10),
-              // ✅ Confirm Appointment Button
               _buildConfirmButton(),
             ],
           ),
@@ -100,53 +108,47 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
     );
   }
 
-  // 🎭 Doctor Profile Widget
   Widget _buildDoctorProfile() {
     return Row(
       children: [
         CircleAvatar(
-          radius: 40,
-          backgroundImage: NetworkImage(widget.profileImage),
-        ),
+            radius: 40, backgroundImage: NetworkImage(widget.profileImage)),
         const SizedBox(width: 15),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Dr " + widget.doctorName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            Text("Dr " + widget.doctorName,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             Text(widget.specialization,
                 style:
                     const TextStyle(color: Color.fromARGB(255, 110, 96, 96))),
-            Row(
-              children: [
-                //const Icon(Icons.location_on, size: 16, color: Colors.blue),
-                //const SizedBox(width: 5),
-                Text(widget.location,
-                    style: const TextStyle(
-                        color: Color.fromARGB(255, 110, 96, 96))),
-              ],
-            ),
+            Text(widget.location,
+                style:
+                    const TextStyle(color: Color.fromARGB(255, 110, 96, 96))),
           ],
         ),
       ],
     );
   }
 
-  // 📅 Date Selector Widget
   Widget _buildDateSelector() {
     return SizedBox(
       height: 70,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: 10,
+        itemCount: 14,
         itemBuilder: (context, index) {
           DateTime date = DateTime.now().add(Duration(days: index));
           bool isSelected = date.day == selectedDate.day;
 
           return GestureDetector(
-            onTap: () => setState(() => selectedDate = date),
+            onTap: () {
+              setState(() {
+                selectedDate = date;
+                _fetchBookedSlots();
+              });
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
               margin: const EdgeInsets.only(right: 10),
@@ -159,19 +161,13 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    DateFormat('E').format(date),
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    "${date.day} ${DateFormat('MMM').format(date)}",
-                    style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black,
-                    ),
-                  ),
+                  Text(DateFormat('E').format(date),
+                      style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.bold)),
+                  Text("${date.day} ${DateFormat('MMM').format(date)}",
+                      style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black)),
                 ],
               ),
             ),
@@ -181,7 +177,6 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
     );
   }
 
-  // ⏰ Time Selector Widget
   Widget _buildTimeSelector() {
     List<String> availableTimes = [];
     for (int hour = 10; hour < 22; hour++) {
@@ -192,50 +187,53 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
     }
 
     return Wrap(
-      spacing: 10, // Horizontal space between boxes
-      runSpacing: 10, // Vertical space between rows
+      spacing: 10,
+      runSpacing: 10,
       children: availableTimes.map((time) {
-        List<String> parts = time.split(" ");
-        List<String> timeParts = parts[0].split(":");
-
-        int hour = int.parse(timeParts[0]);
-        int minute = int.parse(timeParts[1]);
-        bool isPM = parts[1] == "PM";
-
-        // Convert to 24-hour format
-        if (isPM && hour != 12) hour += 12;
-        if (!isPM && hour == 12) hour = 0;
-
+        bool isBooked = bookedSlots.contains(time);
         bool isSelected = selectedTime != null &&
-            selectedTime!.hour == hour &&
-            selectedTime!.minute == minute;
+            DateFormat('h:mm a').format(DateTime(
+                    0, 0, 0, selectedTime!.hour, selectedTime!.minute)) ==
+                time;
 
         return GestureDetector(
-          onTap: () {
-            setState(() {
-              selectedTime = TimeOfDay(hour: hour, minute: minute);
-            });
-          },
+          onTap: isBooked
+              ? null
+              : () {
+                  setState(() {
+                    int hour = int.parse(time.split(":")[0]) +
+                        (time.contains("PM") && !time.startsWith("12")
+                            ? 12
+                            : 0);
+                    int minute = int.parse(time.split(":")[1].split(" ")[0]);
+                    selectedTime = TimeOfDay(hour: hour, minute: minute);
+                  });
+                },
           child: SizedBox(
-            width: 80, // Ensures uniform width for all boxes
-            height: 50, // Ensures uniform height for all boxes
+            width: 80,
+            height: 50,
             child: Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF2B479A) : Colors.white,
+                color: isSelected
+                    ? const Color(0xFF2B479A)
+                    : isBooked
+                        ? Colors.grey.shade300
+                        : Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                     color: isSelected
                         ? const Color(0xFF2B479A)
                         : Colors.grey.shade300),
               ),
-              child: Text(
-                time,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: Text(time,
+                  style: TextStyle(
+                      color: isBooked
+                          ? Colors.grey
+                          : isSelected
+                              ? Colors.white
+                              : Colors.black,
+                      fontWeight: FontWeight.bold)),
             ),
           ),
         );
@@ -243,7 +241,6 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
     );
   }
 
-  // ✅ Confirm Button
   Widget _buildConfirmButton() {
     return ElevatedButton(
       onPressed: selectedTime != null
@@ -265,15 +262,14 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
             }
           : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: selectedTime != null ? Color(0xFF2B479A) : Colors.grey,
+        backgroundColor:
+            selectedTime != null ? const Color(0xFF2B479A) : Colors.grey,
         minimumSize: const Size(double.infinity, 50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      child: const Text(
-        "Make Appointment",
-        style: TextStyle(
-            fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-      ),
+      child: const Text("Make Appointment",
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
     );
   }
 }

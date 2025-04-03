@@ -7,6 +7,7 @@ import 'package:mediconnect/features/settingsScreen/MedicalInfoScreen.dart';
 import 'package:mediconnect/features/settingsScreen/account_settings_page.dart';
 import 'package:mediconnect/features/settingsScreen/doctorEditProfileScreen.dart';
 import 'package:mediconnect/features/settingsScreen/health_record_screen.dart';
+import 'package:mediconnect/features/videoCalling/VideoCallScreen.dart';
 import 'package:provider/provider.dart';
 import 'edit_profile_screen.dart';
 
@@ -172,7 +173,19 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
             _profileOption(
               title: "Appointment History",
               icon: Icons.history,
-              onTap: () {},
+              onTap: () {                      
+                // Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //           builder: (context) => const VideoCallScreen(
+                //             channelName:
+                //                 "mediconnect", // 🔴 Replace with the actual channel name
+                //             token:
+                //                 "007eJxTYDg3j4f1yp1NPToSseGuutN59uYvfdaYrnHr64PpLTfjo88qMCSaWKakWhgZGllYGpgkm6UkGRqkmlhYmBomJSUaJpmarq55m94QyMiw5b85EyMDBIL43Ay5qSmZyfl5eanJJQwMAIHXI9c=", // 🔴 Replace with a valid Agora token
+                //           ),
+                //         ),
+                //       );
+                      },
             ),
 
             const SizedBox(height: 10),

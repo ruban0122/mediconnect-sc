@@ -54,14 +54,14 @@ class DoctorAppointmentDetailScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: () => _updateAppointmentStatus(context, appointmentId, 'approved'),
+                        onPressed: () => _updateAppointmentStatus(context, appointmentId, 'confirmed'),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                        child: const Text("Approve"),
+                        child: const Text("Confirm"),
                       ),
                       ElevatedButton(
-                        onPressed: () => _updateAppointmentStatus(context, appointmentId, 'rejected'),
+                        onPressed: () => _updateAppointmentStatus(context, appointmentId, 'cancelled'),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                        child: const Text("Reject"),
+                        child: const Text("Cancel"),
                       ),
                     ],
                   ),

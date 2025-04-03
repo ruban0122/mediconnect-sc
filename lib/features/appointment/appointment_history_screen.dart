@@ -165,6 +165,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mediconnect/features/appointment/select_date_time_screen2.dart';
 
 class AppointmentHistoryScreen extends StatelessWidget {
   const AppointmentHistoryScreen({super.key});
@@ -175,13 +176,20 @@ class AppointmentHistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Appointment History"),
-        backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Appointment History',
+          style: TextStyle(
+            color: Color(0xFF2B479A),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.white,
       ),
       body: Stack(
         children: [
-          // 🔹 Background
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -191,8 +199,6 @@ class AppointmentHistoryScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // 📜 Appointment List
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('appointments')
@@ -254,37 +260,53 @@ class AppointmentHistoryScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(16),
-                          leading: CircleAvatar(
-                            radius: 30,
-                            backgroundImage: doctorImage.isNotEmpty
-                                ? NetworkImage(doctorImage)
-                                : const AssetImage(
-                                        'assets/doctor_placeholder.png')
-                                    as ImageProvider,
-                          ),
-                          title: Text(
-                            "Dr. $doctorName",
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Column(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 5),
-                              Text(
-                                DateFormat('yyyy-MM-dd HH:mm').format(dateTime),
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black54),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 30,
+                                    backgroundImage: doctorImage.isNotEmpty
+                                        ? NetworkImage(doctorImage)
+                                        : const AssetImage(
+                                                'assets/doctor_placeholder.png')
+                                            as ImageProvider,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Dr. $doctorName",
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          DateFormat('dd-MM-yyyy HH:mm')
+                                              .format(dateTime),
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black54),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        _buildStatusBadge(status),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 5),
-                              _buildStatusBadge(status),
-                            ],
-                          ),
-                          trailing: status == 'pending'
-                              ? Row(
-                                  mainAxisSize: MainAxisSize.min,
+                              if (status == 'pending') ...[
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     _actionButton(
                                       label: "Reschedule",
@@ -292,7 +314,7 @@ class AppointmentHistoryScreen extends StatelessWidget {
                                       onTap: () => _rescheduleAppointment(
                                           context, appointmentId),
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: 20),
                                     _actionButton(
                                       label: "Cancel",
                                       color: Colors.red,
@@ -300,8 +322,10 @@ class AppointmentHistoryScreen extends StatelessWidget {
                                           context, appointmentId),
                                     ),
                                   ],
-                                )
-                              : null,
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -356,36 +380,50 @@ class AppointmentHistoryScreen extends StatelessWidget {
   }
 
   // 📌 Reschedule Appointment
+  // Add this method to your existing AppointmentHistoryScreen class
   void _rescheduleAppointment(
       BuildContext context, String appointmentId) async {
-    DateTime? newDate = await _pickDate(context);
-    if (newDate == null) return;
+    // First fetch the existing appointment details
+    DocumentSnapshot appointmentDoc = await FirebaseFirestore.instance
+        .collection('appointments')
+        .doc(appointmentId)
+        .get();
 
-    TimeOfDay? newTime = await _pickTime(context);
-    if (newTime == null) return;
+    if (!appointmentDoc.exists) return;
 
-    DateTime newDateTime = DateTime(
-        newDate.year, newDate.month, newDate.day, newTime.hour, newTime.minute);
+    var data = appointmentDoc.data() as Map<String, dynamic>;
+    var doctorId = data['doctorId'];
 
-    bool confirmReschedule = await _showConfirmationDialog(
-        context,
-        "Reschedule Appointment",
-        "Do you want to reschedule to ${DateFormat('yyyy-MM-dd HH:mm').format(newDateTime)}?");
-    if (confirmReschedule) {
-      await FirebaseFirestore.instance
-          .collection('appointments')
-          .doc(appointmentId)
-          .update({
-        'dateTime': newDateTime,
-        'status': 'rescheduled',
-      });
+    // Then fetch doctor details
+    DocumentSnapshot doctorDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(doctorId)
+        .get();
 
+    if (!doctorDoc.exists) return;
+
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectDateTimeScreen2(
+          doctorId: doctorId,
+          appointmentId: appointmentId,
+          doctorName: doctorDoc['fullName'],
+          profileImage: doctorDoc['profileImageUrl'] ?? '',
+          specialization: doctorDoc['specialization'] ?? '',
+          location: doctorDoc['address'] ?? '',
+        ),
+      ),
+    );
+
+    if (result == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Appointment Rescheduled Successfully")),
+        const SnackBar(content: Text("Appointment rescheduled successfully!")),
       );
     }
   }
 
+// Remove the old _rescheduleAppointment method
   // 📌 Cancel Appointment
   void _cancelAppointment(BuildContext context, String appointmentId) async {
     bool confirmCancel = await _showConfirmationDialog(

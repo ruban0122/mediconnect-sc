@@ -120,9 +120,17 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Select a Doctor"),
-        backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Select Doctor',
+          style: TextStyle(
+            color: Color(0xFF2B479A),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.white,
       ),
       body: Stack(
         children: [

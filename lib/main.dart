@@ -39,6 +39,7 @@ import 'package:mediconnect/features/login/home_page.dart';
 import 'package:mediconnect/features/main_app_screen.dart';
 import 'package:mediconnect/features/registration/auth_service.dart';
 import 'package:mediconnect/notification_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'features/onboarding/onboarding_screen.dart';
@@ -47,6 +48,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await NotificationService.initialize();
+  await Permission.camera.request();
+  await Permission.microphone.request();
 
   runApp(
     MultiProvider(

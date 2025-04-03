@@ -100,6 +100,7 @@
 import 'package:flutter/material.dart';
 import 'package:mediconnect/features/appointment/appointment_history_screen.dart';
 import 'package:mediconnect/features/appointment/doctor_list_screen.dart';
+import 'package:mediconnect/features/videoCalling/VideoCallScreen.dart';
 
 class AppointmentPage extends StatelessWidget {
   const AppointmentPage({super.key});
@@ -177,6 +178,29 @@ class AppointmentPage extends StatelessWidget {
                               const AppointmentHistoryScreen(),
                         ),
                       );
+                    },
+                  ),
+                  const SizedBox(height: 30),
+
+                  // 📅 Book Appointment
+                  _buildOptionCard(
+                    context,
+                    title: "Join Appointment",
+                    subtitle: "Test",
+                    icon: Icons.calendar_today_rounded,
+                    color: Colors.blueAccent,
+                    onTap: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => const VideoCallScreen(
+                      //       channelName:
+                      //           "mediconnect", // 🔴 Replace with the actual channel name
+                      //       token:
+                      //           "007eJxTYDg3j4f1yp1NPToSseGuutN59uYvfdaYrnHr64PpLTfjo88qMCSaWKakWhgZGllYGpgkm6UkGRqkmlhYmBomJSUaJpmarq55m94QyMiw5b85EyMDBIL43Ay5qSmZyfl5eanJJQwMAIHXI9c=", // 🔴 Replace with a valid Agora token
+                      //     ),
+                      //   ),
+                      // );
                     },
                   ),
                 ],
