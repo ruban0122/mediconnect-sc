@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mediconnect/features/appointment/appointment_page.dart';
-import 'package:mediconnect/features/appointment/doctorAppointmentsScreen.dart';
+import 'package:mediconnect/features/appointment/doctorAppointmentPage.dart';
+import 'package:mediconnect/features/appointment/doctorAppointmentsUpcomingScreen.dart';
 import 'package:mediconnect/features/doctor_home_page.dart';
 import 'package:mediconnect/features/login/home_page.dart';
 import 'package:mediconnect/features/settingsScreen/doctorSettingsPage.dart';
@@ -48,7 +49,8 @@ class _DocHomePageState extends State<DocHomePage> {
             // const SearchPage(),
             // const BookAppointmentScreen(),
             //const AppointmentListScreen(),
-            const DoctorAppointmentsScreen(),
+           // const DoctorAppointmentsScreen(),
+            const DoctorAppointmentPage(),
             // const ChatBotPage(),
             const DoctorProfilePage(),
           ];
