@@ -47,6 +47,7 @@ import 'features/onboarding/onboarding_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   await NotificationService.initialize();
   await Permission.camera.request();
   await Permission.microphone.request();
