@@ -7,7 +7,6 @@ import 'package:mediconnect/features/settingsScreen/MedicalInfoScreen.dart';
 import 'package:mediconnect/features/settingsScreen/account_settings_page.dart';
 import 'package:mediconnect/features/settingsScreen/doctorEditProfileScreen.dart';
 import 'package:mediconnect/features/settingsScreen/health_record_screen.dart';
-import 'package:mediconnect/features/videoCalling/VideoCallScreen.dart';
 import 'package:provider/provider.dart';
 import 'edit_profile_screen.dart';
 

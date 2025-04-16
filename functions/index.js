@@ -2,14 +2,14 @@ const { initializeApp } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 const { getMessaging } = require('firebase-admin/messaging');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
-const { logger } = require('firebase-functions');  // ✅ Import logger for debugging
-const functions = require('firebase-functions');  // ✅ Import Firebase Functions (for v1)
+const { logger } = require('firebase-functions');
+const functions = require('firebase-functions');
 
 initializeApp();
 const db = getFirestore();
 const messaging = getMessaging();
 
-// ✅ V2 Syntax for better performance
+// ✅ Notification: New Appointment
 exports.notifyDoctorNewAppointment = onDocumentCreated(
   {
     document: 'appointments/{appointmentId}',
@@ -21,7 +21,6 @@ exports.notifyDoctorNewAppointment = onDocumentCreated(
     const appointment = event.data.data();
     const doctorId = appointment.doctorId;
 
-    // Fetch doctor's FCM token
     const doctorDoc = await db.collection('users').doc(doctorId).get();
     if (!doctorDoc.exists) {
       logger.error("❌ Doctor not found!");
@@ -31,7 +30,6 @@ exports.notifyDoctorNewAppointment = onDocumentCreated(
     const doctorToken = doctorDoc.data().fcmToken;
     logger.info("📲 Doctor's FCM Token:", doctorToken);
 
-    // Send notification
     try {
       await messaging.send({
         token: doctorToken,
@@ -52,7 +50,7 @@ exports.notifyDoctorNewAppointment = onDocumentCreated(
   }
 );
 
-// ✅ V2 Syntax for sending notifications
+// ✅ Notification: General push
 exports.sendPushNotification = onDocumentCreated(
   {
     document: 'notifications/{notificationId}',
@@ -78,7 +76,6 @@ exports.sendPushNotification = onDocumentCreated(
         data: notification.data,
       });
 
-      // Clean up after sending
       await snapshot.ref.delete();
       logger.info("🗑️ Notification document deleted after sending.");
     } catch (error) {
@@ -86,3 +83,29 @@ exports.sendPushNotification = onDocumentCreated(
     }
   }
 );
+
+// ✅ Agora Token Generator (v1 HTTPS Function)
+const { RtcTokenBuilder, RtcRole } = require('agora-token');
+
+const AGORA_APP_ID = 'a49de82128904c6db10e48851bba1b55';
+const AGORA_CERTIFICATE = '1c43ce5759fc428e88d4ad9a4f89282e';
+
+exports.generateAgoraToken = functions.https.onRequest((req, res) => {
+  const channelName = req.query.channelName;
+  if (!channelName) {
+    return res.status(400).json({ error: "channelName is required" });
+  }
+
+  const uid = req.query.uid ? parseInt(req.query.uid) : 0;
+  const role = req.query.role === "subscriber" ? RtcRole.SUBSCRIBER : RtcRole.PUBLISHER;
+  const expireTime = req.query.expireTime ? parseInt(req.query.expireTime) : 3600;
+
+  const currentTime = Math.floor(Date.now() / 1000);
+  const privilegeExpireTime = currentTime + expireTime;
+
+  const token = RtcTokenBuilder.buildTokenWithUid(
+    AGORA_APP_ID, AGORA_CERTIFICATE, channelName, uid, role, privilegeExpireTime
+  );
+
+  return res.json({ token });
+});

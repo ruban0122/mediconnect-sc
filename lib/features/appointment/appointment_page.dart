@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mediconnect/features/appointment/appointment_history_screen.dart';
 import 'package:mediconnect/features/appointment/doctor_list_screen.dart';
-import 'package:mediconnect/features/videoCalling/VideoCallScreen.dart';
 
 class AppointmentPage extends StatelessWidget {
   const AppointmentPage({super.key});
