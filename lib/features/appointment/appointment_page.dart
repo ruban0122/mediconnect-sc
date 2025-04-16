@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mediconnect/features/appointment/appointment_history_screen.dart';
 import 'package:mediconnect/features/appointment/doctor_list_screen.dart';
+import 'package:mediconnect/features/appointment/patientMyAppointmentsScreen.dart';
 
 class AppointmentPage extends StatelessWidget {
   const AppointmentPage({super.key});
@@ -44,6 +45,25 @@ class AppointmentPage extends StatelessWidget {
                     style: TextStyle(fontSize: 16, color: Colors.black54),
                   ),
                   const SizedBox(height: 30),
+
+                  // 📅 Book Appointment
+                  _buildOptionCard(
+                    context,
+                    title: "My Appointment",
+                    subtitle: "Find a doctor & schedule a visit",
+                    icon: Icons.calendar_today_rounded,
+                    color: Colors.redAccent,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const PatientMyAppointmentsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
 
                   // 📅 Book Appointment
                   _buildOptionCard(
