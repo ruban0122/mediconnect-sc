@@ -360,6 +360,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mediconnect/features/videoCalling/chatting/chat_screen.dart';
 import 'package:mediconnect/features/videoCalling/video_call_screen.dart';
 import 'package:mediconnect/notification_service.dart';
 
@@ -451,6 +452,33 @@ class _PatientAppointmentDetailScreenState
                 if ((status == 'confirmed' || status == 'in_progress') &&
                     method == 'video_call')
                   Center(child: _buildJoinCallButton(canJoinCall(dateTime))),
+                if ((status == 'confirmed' || status == 'in_progress') &&
+                    method == 'messaging')
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                            appointmentId: widget.appointment.id,
+                            otherUserId: widget.appointment['doctorId'],
+                            otherUserName: doctorName,
+                            otherUserImageUrl: doctorImage,
+                          ),
+                        ),
+                      ),
+                      icon: const Icon(Icons.chat),
+                      label: const Text("Open Chat"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2B479A),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 24),
               ],
             ),
