@@ -57,6 +57,46 @@ class _SelectDateTimeScreen2State extends State<SelectDateTimeScreen2> {
     });
   }
 
+//Before Software Construction
+  // Future<void> _confirmReschedule() async {
+  //   if (selectedTime == null) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text("Please select a time slot")),
+  //     );
+  //     return;
+  //   }
+
+  //   setState(() => _isLoading = true);
+
+  //   try {
+  //     final newDateTime = DateTime(
+  //       selectedDate.year,
+  //       selectedDate.month,
+  //       selectedDate.day,
+  //       selectedTime!.hour,
+  //       selectedTime!.minute,
+  //     );
+
+  //     await FirebaseFirestore.instance
+  //         .collection('appointments')
+  //         .doc(widget.appointmentId)
+  //         .update({
+  //       'dateTime': newDateTime,
+  //       'status': 'rescheduled',
+  //       'updatedAt': FieldValue.serverTimestamp(),
+  //     });
+
+  //     Navigator.pop(context, true); // Return success
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Failed to reschedule: $e")),
+  //     );
+  //   } finally {
+  //     setState(() => _isLoading = false);
+  //   }
+  // }
+
+  //After Software Construction
   Future<void> _confirmReschedule() async {
     if (selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,16 +105,33 @@ class _SelectDateTimeScreen2State extends State<SelectDateTimeScreen2> {
       return;
     }
 
+    // Pre-condition assertions
+    assert(widget.appointmentId.isNotEmpty, "Appointment ID must not be empty");
+    debugPrint('✓ Appointment ID check passed');
+
+    assert(selectedDate != null, "Selected date must not be null");
+    debugPrint('✓ Selected date check passed');
+
+    final newDateTime = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime!.hour,
+      selectedTime!.minute,
+    );
+
+    assert(newDateTime.isAfter(DateTime.now()),
+        "New appointment time must be in the future");
+    debugPrint('✓ New date/time is in the future');
+
+    // Invariant: loading must not already be true
+    assert(!_isLoading, "Another operation is already in progress");
+    debugPrint('✓ Not already loading');
+
     setState(() => _isLoading = true);
 
     try {
-      final newDateTime = DateTime(
-        selectedDate.year,
-        selectedDate.month,
-        selectedDate.day,
-        selectedTime!.hour,
-        selectedTime!.minute,
-      );
+      debugPrint('--- Rescheduling appointment ---');
 
       await FirebaseFirestore.instance
           .collection('appointments')
@@ -85,13 +142,39 @@ class _SelectDateTimeScreen2State extends State<SelectDateTimeScreen2> {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
+      debugPrint('✓ Firestore document updated');
+
+      // Post-condition: Verify update
+      final updatedDoc = await FirebaseFirestore.instance
+          .collection('appointments')
+          .doc(widget.appointmentId)
+          .get();
+
+      assert(updatedDoc.exists,
+          "Appointment should still exist after rescheduling");
+      debugPrint('✓ Appointment document still exists');
+
+      assert(updatedDoc['status'] == 'rescheduled',
+          "Status should be updated to 'rescheduled'");
+      debugPrint('✓ Status updated to rescheduled');
+
+      assert(
+          updatedDoc['updatedAt'] != null, "updatedAt timestamp must be set");
+      debugPrint('✓ Timestamp set');
+
       Navigator.pop(context, true); // Return success
     } catch (e) {
+      debugPrint('✗ ERROR: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to reschedule: $e")),
       );
     } finally {
       setState(() => _isLoading = false);
+
+      // Cleanup invariant
+      assert(!_isLoading, "Loading state must be reset");
+
+      debugPrint('✓ Loading state reset');
     }
   }
 
