@@ -389,6 +389,13 @@ class _PatientAppointmentDetailScreenState
     return now.isAfter(startWindow) && now.isBefore(endWindow);
   }
 
+  bool canChat(DateTime appointmentTime) {
+    final now = DateTime.now();
+    final startWindow = appointmentTime.subtract(const Duration(minutes: 10));
+    final endWindow = appointmentTime.add(const Duration(minutes: 40));
+    return now.isAfter(startWindow) && now.isBefore(endWindow);
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateTime = (widget.appointment['dateTime'] as Timestamp).toDate();
@@ -443,7 +450,6 @@ class _PatientAppointmentDetailScreenState
                   _buildInfoTile(_getMethodIcon(method), "Type",
                       method.replaceAll('_', ' ').toUpperCase()),
                   _buildInfoTile(Icons.attach_money, "Fee", price.toString()),
-                  // _buildInfoTile(Icons.update, "Fee", status),
                 ]),
                 const SizedBox(height: 24),
                 Center(child: _buildStatusBadge(status)),
@@ -456,21 +462,29 @@ class _PatientAppointmentDetailScreenState
                     method == 'messaging')
                   Center(
                     child: ElevatedButton.icon(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatScreen(
-                            appointmentId: widget.appointment.id,
-                            otherUserId: widget.appointment['doctorId'],
-                            otherUserName: doctorName,
-                            otherUserImageUrl: doctorImage,
-                          ),
-                        ),
-                      ),
+                      onPressed: canChat(dateTime)
+                          ? () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatScreen(
+                                    appointmentId: widget.appointment.id,
+                                    otherUserId: widget.appointment['doctorId'],
+                                    otherUserName: doctorName,
+                                    otherUserImageUrl: doctorImage,
+                                  ),
+                                ),
+                              )
+                          : null,
                       icon: const Icon(Icons.chat),
-                      label: const Text("Open Chat"),
+                      label: Text(
+                        canChat(dateTime)
+                            ? "Open Chat"
+                            : "Chat Not Available Yet",
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2B479A),
+                        backgroundColor: canChat(dateTime)
+                            ? const Color(0xFF2B479A)
+                            : Colors.grey,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 24, vertical: 12),

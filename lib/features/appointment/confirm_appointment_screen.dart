@@ -358,15 +358,19 @@ class ConfirmAppointmentScreen extends StatefulWidget {
 class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
   bool isLoading = false;
 
- //Problem-Solving 3 - Q2 - Software Construction
+  //Problem-Solving 3 - Q2 - Software Construction
   Future<void> _confirmBooking() async {
     // Pre-condition assertions
     assert(widget.doctorId.isNotEmpty, "Doctor ID must not be empty");
     assert(widget.doctorName.isNotEmpty, "Doctor name must not be empty");
-    assert(widget.selectedDate.isAfter(DateTime.now().subtract(const Duration(days: 1))),
+    assert(
+        widget.selectedDate
+            .isAfter(DateTime.now().subtract(const Duration(days: 1))),
         "Appointment date must be in the future");
-    assert(widget.appointmentMethod.isNotEmpty,"Appointment method must be specified");
-    assert(widget.appointmentPrice.isNotEmpty,"Appointment price must be specified");
+    assert(widget.appointmentMethod.isNotEmpty,
+        "Appointment method must be specified");
+    assert(widget.appointmentPrice.isNotEmpty,
+        "Appointment price must be specified");
 
     setState(() {
       isLoading = true;
@@ -456,7 +460,6 @@ class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
       assert(!isLoading, "Loading state must be false after operation");
     }
   }
-
 
   //Problem-Solving 3 - Q3 - Software Construction
 //   Future<void> _confirmBooking() async {
@@ -563,9 +566,6 @@ class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
 //     throw Exception("Invariant violated: $message");
 //   }
 // }
-
-
-
 
   String _getMethodDescription() {
     switch (widget.appointmentMethod) {
