@@ -323,44 +323,7 @@ class _DoctorAppointmentDetailScreenState
     }
   }
 
-//Before Software Construction
-  // Future<void> _updateStatus(String newStatus) async {
-  //   setState(() => _isLoading = true);
-  //   try {
-  //     await FirebaseFirestore.instance
-  //         .collection('appointments')
-  //         .doc(widget.appointment.id)
-  //         .update({
-  //       'status': newStatus,
-  //       'updatedAt': FieldValue.serverTimestamp(),
-  //     });
-
-  //     await NotificationService.sendNotificationToUser(
-  //       userId: widget.appointment['patientId'],
-  //       title: 'Appointment Status Updated',
-  //       body: 'Your appointment has been $newStatus',
-  //       data: {
-  //         'type': 'appointment_status',
-  //         'appointmentId': widget.appointment.id,
-  //         'status': newStatus,
-  //       },
-  //     );
-
-  //     if (!mounted) return;
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Appointment marked as $newStatus")),
-  //     );
-  //     Navigator.pop(context);
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Failed to update: $e")),
-  //     );
-  //   } finally {
-  //     setState(() => _isLoading = false);
-  //   }
-  // }
-
-  //After Software Construction
+  //Problem-Solving 3 - Q2 - Software Construction
   Future<void> _updateStatus(String newStatus) async {
     // Debug output header
     debugPrint('\n=== STARTING STATUS UPDATE CHECKS ===');
@@ -468,6 +431,107 @@ class _DoctorAppointmentDetailScreenState
       debugPrint('✓ Loading state reset verification passed');
     }
   }
+
+  //Problem-Solving 3 - Q3 - Software Construction
+//   Future<void> _updateStatus(String newStatus) async {
+//   // Debug output header
+//   debugPrint('\n=== STARTING STATUS UPDATE CHECKS ===');
+//   debugPrint('Current Status: ${widget.appointment['status']}');
+//   debugPrint('Requested New Status: $newStatus');
+
+//   // PRE-CONDITION CHECKS
+//   debugPrint('\n--- Checking Pre-Conditions ---');
+//   require(widget.appointment.exists, "Appointment document must exist");
+//   debugPrint('✓ Document exists check passed');
+
+//   require(widget.appointment.id.isNotEmpty, "Appointment ID must not be empty");
+//   debugPrint('✓ ID not empty check passed');
+
+//   require(['confirmed', 'cancelled'].contains(newStatus),
+//       "Invalid status value - can only confirm or cancel");
+//   debugPrint('✓ Valid status transition check passed');
+
+//   require(widget.appointment['status'] == 'pending',
+//       "Can only update status from 'pending'");
+//   debugPrint('✓ Current status is pending check passed');
+
+//   require(_auth.currentUser?.uid == widget.appointment['doctorId'],
+//       "Only assigned doctor can update status");
+//   debugPrint('✓ Doctor authorization check passed');
+
+//   // CLASS INVARIANTS
+//   debugPrint('\n--- Checking Class Invariants ---');
+//   invariant(_auth.currentUser != null, "Doctor must be authenticated");
+//   debugPrint('✓ Doctor authenticated check passed');
+
+//   invariant(!_isLoading, "Operation already in progress");
+//   debugPrint('✓ No duplicate operation check passed');
+
+//   setState(() => _isLoading = true);
+//   debugPrint('\n--- Starting Status Update Process ---');
+
+//   try {
+//     // PROCESSING INVARIANTS
+//     final originalStatus = widget.appointment['status'];
+//     invariant(originalStatus == 'pending', "Original status must be pending");
+//     debugPrint('✓ Original status verification passed');
+
+//     // Perform the update
+//     debugPrint('Updating Firestore document...');
+//     await FirebaseFirestore.instance
+//         .collection('appointments')
+//         .doc(widget.appointment.id)
+//         .update({
+//       'status': newStatus,
+//       'updatedAt': FieldValue.serverTimestamp(),
+//     });
+
+//     // POST-CONDITION CHECKS
+//     debugPrint('\n--- Verifying Post-Conditions ---');
+//     debugPrint('Fetching updated document...');
+//     final updatedDoc = await FirebaseFirestore.instance
+//         .collection('appointments')
+//         .doc(widget.appointment.id)
+//         .get();
+
+//     ensure(updatedDoc.exists, "Appointment document should still exist");
+//     debugPrint('✓ Document existence check passed');
+
+//     ensure(updatedDoc['status'] == newStatus,
+//         "Status should be updated to $newStatus");
+//     debugPrint('✓ Status update verification passed');
+
+//     ensure(updatedDoc['updatedAt'] != null, "updatedAt timestamp should be set");
+//     debugPrint('✓ Timestamp update verification passed');
+
+//   } catch (e) {
+//     debugPrint('Error updating status: $e');
+//     rethrow;
+//   } finally {
+//     if (mounted) {
+//       setState(() => _isLoading = false);
+//     }
+//     invariant(!_isLoading, "Loading flag must be reset after operation");
+//   }
+// }
+
+// void require(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Precondition failed: $message");
+//   }
+// }
+
+// void ensure(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Postcondition failed: $message");
+//   }
+// }
+
+// void invariant(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Invariant violated: $message");
+//   }
+// }
 
   Future<void> _saveNotes() async {
     setState(() => _isLoading = true);

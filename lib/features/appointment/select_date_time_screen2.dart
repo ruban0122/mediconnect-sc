@@ -57,46 +57,7 @@ class _SelectDateTimeScreen2State extends State<SelectDateTimeScreen2> {
     });
   }
 
-//Before Software Construction
-  // Future<void> _confirmReschedule() async {
-  //   if (selectedTime == null) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text("Please select a time slot")),
-  //     );
-  //     return;
-  //   }
-
-  //   setState(() => _isLoading = true);
-
-  //   try {
-  //     final newDateTime = DateTime(
-  //       selectedDate.year,
-  //       selectedDate.month,
-  //       selectedDate.day,
-  //       selectedTime!.hour,
-  //       selectedTime!.minute,
-  //     );
-
-  //     await FirebaseFirestore.instance
-  //         .collection('appointments')
-  //         .doc(widget.appointmentId)
-  //         .update({
-  //       'dateTime': newDateTime,
-  //       'status': 'rescheduled',
-  //       'updatedAt': FieldValue.serverTimestamp(),
-  //     });
-
-  //     Navigator.pop(context, true); // Return success
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Failed to reschedule: $e")),
-  //     );
-  //   } finally {
-  //     setState(() => _isLoading = false);
-  //   }
-  // }
-
-  //After Software Construction
+//Problem-Solving 3 - Q2 - Software Construction
   Future<void> _confirmReschedule() async {
     if (selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -177,6 +138,95 @@ class _SelectDateTimeScreen2State extends State<SelectDateTimeScreen2> {
       debugPrint('✓ Loading state reset');
     }
   }
+
+  //Problem-Solving 3 - Q3 - Software Construction
+//   Future<void> _confirmReschedule() async {
+//   // === PRE-CONDITION CHECKS ===
+//   debugPrint('\n--- Checking Pre-Conditions ---');
+//   require(widget.appointmentId.isNotEmpty, "Appointment ID must not be empty");
+//   debugPrint('✓ Appointment ID check passed');
+//   require(selectedDate != null, "Selected date must not be null");
+//   debugPrint('✓ Selected date check passed');
+
+//   if (selectedTime == null) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(content: Text("Please select a time slot")),
+//     );
+//     return;
+//   }
+
+//   // === CLASS INVARIANT ===
+//   invariant(!_isLoading, "Another operation is already in progress");
+//   debugPrint('✓ Not already loading');
+
+//   setState(() => _isLoading = true);
+
+//   try {
+//     final newDateTime = DateTime(
+//       selectedDate.year,
+//       selectedDate.month,
+//       selectedDate.day,
+//       selectedTime!.hour,
+//       selectedTime!.minute,
+//     );
+
+//     // === PROCESSING INVARIANT ===
+//     invariant(newDateTime.isAfter(DateTime.now()), "New appointment time must be in the future");
+//    debugPrint('✓ New date/time is in the future');
+
+//     await FirebaseFirestore.instance
+//         .collection('appointments')
+//         .doc(widget.appointmentId)
+//         .update({
+//       'dateTime': newDateTime,
+//       'status': 'rescheduled',
+//       'updatedAt': FieldValue.serverTimestamp(),
+//     });
+
+//     // === POST-CONDITION CHECKS ===
+//     final updatedDoc = await FirebaseFirestore.instance
+//         .collection('appointments')
+//         .doc(widget.appointmentId)
+//         .get();
+
+//     ensure(updatedDoc.exists, "Appointment should still exist after rescheduling");
+//     debugPrint('✓ Appointment document still exists');
+//     ensure(updatedDoc['status'] == 'rescheduled', "Status should be updated to 'rescheduled'");
+//     debugPrint('✓ Status updated to rescheduled');
+//     ensure(updatedDoc['updatedAt'] != null, "updatedAt timestamp must be set");
+//     debugPrint('✓ Timestamp set');
+
+//     Navigator.pop(context, true); // Return success
+//   } catch (e) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text("Failed to reschedule: $e")),
+//     );
+//   } finally {
+//     setState(() => _isLoading = false);
+
+//     // === CLEANUP INVARIANT ===
+//     invariant(!_isLoading, "Loading state must be false after operation");
+//    debugPrint('✓ Loading is false after operation');
+//   }
+// }
+
+// void require(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Precondition failed: $message");
+//   }
+// }
+
+// void ensure(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Postcondition failed: $message");
+//   }
+// }
+
+// void invariant(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Invariant violated: $message");
+//   }
+// }
 
   @override
   Widget build(BuildContext context) {

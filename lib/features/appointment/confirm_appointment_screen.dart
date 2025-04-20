@@ -358,6 +358,7 @@ class ConfirmAppointmentScreen extends StatefulWidget {
 class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
   bool isLoading = false;
 
+ //Problem-Solving 3 - Q2 - Software Construction
   Future<void> _confirmBooking() async {
     // Pre-condition assertions
     assert(widget.doctorId.isNotEmpty, "Doctor ID must not be empty");
@@ -455,6 +456,116 @@ class _ConfirmAppointmentScreenState extends State<ConfirmAppointmentScreen> {
       assert(!isLoading, "Loading state must be false after operation");
     }
   }
+
+
+  //Problem-Solving 3 - Q3 - Software Construction
+//   Future<void> _confirmBooking() async {
+//   _require(widget.doctorId.isNotEmpty, "Doctor ID must not be empty");
+//   _require(widget.doctorName.isNotEmpty, "Doctor name must not be empty");
+//   _require(
+//     widget.selectedDate.isAfter(DateTime.now().subtract(const Duration(days: 1))),
+//     "Appointment date must be in the future",
+//   );
+//   _require(widget.appointmentMethod.isNotEmpty, "Appointment method is required");
+//   _require(widget.appointmentPrice.isNotEmpty, "Appointment price is required");
+
+//   setState(() {
+//     isLoading = true;
+//   });
+
+//   try {
+//     // Invariant: User must be authenticated
+//     final auth = FirebaseAuth.instance;
+//     final user = auth.currentUser;
+//     _invariant(user != null, "User must be logged in");
+//     final userId = user!.uid;
+//     _invariant(userId.isNotEmpty, "User ID must not be empty");
+
+//     // Construct appointment DateTime
+//     final appointmentDateTime = DateTime(
+//       widget.selectedDate.year,
+//       widget.selectedDate.month,
+//       widget.selectedDate.day,
+//       widget.selectedTime.hour,
+//       widget.selectedTime.minute,
+//     );
+//     _invariant(!appointmentDateTime.isBefore(DateTime.now()), "Appointment time must be in the future");
+
+//     final appointmentId = "$userId-${DateTime.now().millisecondsSinceEpoch}";
+//     _invariant(appointmentId.isNotEmpty, "Appointment ID must not be empty");
+//     _invariant(appointmentId.contains(userId), "Appointment ID must contain user ID");
+
+//     final docRef = FirebaseFirestore.instance.collection('appointments').doc(appointmentId);
+
+//     final appointmentData = {
+//       'patientId': userId,
+//       'doctorId': widget.doctorId,
+//       'dateTime': appointmentDateTime.toUtc(),
+//       'status': 'pending',
+//       'method': widget.appointmentMethod,
+//       'price': widget.appointmentPrice,
+//       'createdAt': FieldValue.serverTimestamp(),
+//       'doctorName': widget.doctorName,
+//     };
+
+//     // Invariant: Required data fields present
+//     _invariant(appointmentData.containsKey('patientId'), "Missing patientId");
+//     _invariant(appointmentData.containsKey('doctorId'), "Missing doctorId");
+//     _invariant(appointmentData.containsKey('dateTime'), "Missing dateTime");
+
+//     await docRef.set(appointmentData);
+
+//     // Postcondition: Verify document was created
+//     final docSnapshot = await docRef.get();
+//     _ensure(docSnapshot.exists, "Appointment document was not created");
+//     _ensure(docSnapshot.data()?['patientId'] == userId, "Incorrect patient ID in saved document");
+
+//     // Navigate to success screen
+//     if (!mounted) return;
+//     Navigator.pushReplacement(
+//       context,
+//       MaterialPageRoute(builder: (context) => const BookingSuccessScreen()),
+//     );
+
+//     // Postcondition: Should not remain on confirm screen
+//     _ensure(!mounted || ModalRoute.of(context)?.settings.name != '/confirm', "Navigation failed");
+//   } catch (e) {
+//     print("Error booking appointment: $e");
+//     if (mounted) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text("Failed to book appointment. Try again.")),
+//       );
+//     }
+//   } finally {
+//     if (mounted) {
+//       setState(() {
+//         isLoading = false;
+//       });
+//     }
+//     _invariant(!isLoading, "Loading state must be false after operation");
+//   }
+// }
+
+// void _require(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Precondition failed: $message");
+//   }
+// }
+
+// void _ensure(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Postcondition failed: $message");
+//   }
+// }
+
+// void _invariant(bool condition, String message) {
+//   if (!condition) {
+//     throw Exception("Invariant violated: $message");
+//   }
+// }
+
+
+
 
   String _getMethodDescription() {
     switch (widget.appointmentMethod) {
