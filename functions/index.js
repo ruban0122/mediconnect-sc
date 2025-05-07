@@ -4,10 +4,35 @@ const { getMessaging } = require('firebase-admin/messaging');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { logger } = require('firebase-functions');
 const functions = require('firebase-functions');
+const cors = require('cors')({ origin: true });
+
 
 initializeApp();
 const db = getFirestore();
 const messaging = getMessaging();
+
+// ✅ 1. Create Stripe Checkout Session (HTTP Function)
+exports.createPaymentIntent = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const { amount, email } = req.body;
+
+      // Create a PaymentIntent on the server side
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount, // Amount in cents
+        currency: 'myr',
+        receipt_email: email, // Email for receipt
+      });
+
+      // Return the client secret to the client
+      res.status(200).json({ clientSecret: paymentIntent.client_secret });
+    } catch (error) {
+      console.error("❌ Stripe error:", error);
+      res.status(500).send({ error: error.message });
+    }
+  });
+});
+
 
 // ✅ Notification: New Appointment
 exports.notifyDoctorNewAppointment = onDocumentCreated(

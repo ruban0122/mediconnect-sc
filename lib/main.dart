@@ -1,40 +1,6 @@
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:flutter/material.dart';
-// import 'package:mediconnect/features/registration/auth_service.dart';
-// import 'package:provider/provider.dart';
-
-// import 'features/onboarding/onboarding_screen.dart';
-
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(); // 👈 This is mandatory
-
-//   runApp(
-//     MultiProvider(
-//       providers: [
-//         Provider<AuthService>(
-//           create: (_) => AuthService(),
-//         ),
-//       ],
-//       child: MyApp(),
-//     ),
-//   );
-// }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: OnboardingScreen(),
-//     );
-//   }
-// }
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mediconnect/features/login/home_page.dart';
 import 'package:mediconnect/features/main_app_screen.dart';
 import 'package:mediconnect/features/registration/auth_service.dart';
@@ -51,6 +17,7 @@ void main() async {
   await NotificationService.initialize();
   await Permission.camera.request();
   await Permission.microphone.request();
+  Stripe.publishableKey = 'pk_test_51RLeK7Q68gIi0BHeqhus9oOjzTy47rqxHbPJNBM8g3u3VQF8KVWNKC3BdgaCS3GjfAF2lQJrR9zGXq3U0U5uVNZp00viFxrpka'; // 🔑 Replace with your Stripe public key
 
   runApp(
     MultiProvider(
