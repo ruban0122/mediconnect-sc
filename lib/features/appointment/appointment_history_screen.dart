@@ -228,8 +228,16 @@ class AppointmentHistoryScreen extends StatelessWidget {
                   var appointment = appointments[index];
                   var appointmentId = appointment.id;
                   var doctorId = appointment['doctorId'];
-                  var dateTime =
-                      (appointment['dateTime'] as Timestamp).toDate();
+                  var rawDate = appointment['dateTime'];
+                  late DateTime dateTime;
+
+                  if (rawDate is Timestamp) {
+                    dateTime = rawDate.toDate();
+                  } else if (rawDate is String) {
+                    dateTime = DateTime.parse(rawDate);
+                  } else {
+                    dateTime = DateTime.now(); // fallback (or handle error)
+                  }
                   var status = appointment['status'];
 
                   return FutureBuilder<DocumentSnapshot>(

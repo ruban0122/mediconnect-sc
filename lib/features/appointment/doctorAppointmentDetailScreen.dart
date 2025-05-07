@@ -43,7 +43,7 @@ class _DoctorAppointmentDetailScreenState
   Widget build(BuildContext context) {
     final dateTime = (widget.appointment['dateTime'] as Timestamp).toDate();
     final status = widget.appointment['status'];
-    final method = widget.appointment['method'] ?? 'appointment';
+    final method = widget.appointment['appointmentMethod'] ?? 'appointment';
     final price = widget.appointment['price'] ?? 'Not specified';
 
     return Scaffold(
