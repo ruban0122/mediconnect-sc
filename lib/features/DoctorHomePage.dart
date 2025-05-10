@@ -7,10 +7,7 @@ import 'package:mediconnect/features/appointment/doctorAppointmentsUpcomingScree
 import 'package:mediconnect/features/doctor_home_page.dart';
 import 'package:mediconnect/features/login/home_page.dart';
 import 'package:mediconnect/features/settingsScreen/doctorSettingsPage.dart';
-
-import 'search_page.dart';
-
-import 'chatbot_page.dart';
+import 'aiHealthChatBotScreen.dart';
 import 'settingsScreen/settings_page.dart';
 
 class DocHomePage extends StatefulWidget {
@@ -49,7 +46,7 @@ class _DocHomePageState extends State<DocHomePage> {
             // const SearchPage(),
             // const BookAppointmentScreen(),
             //const AppointmentListScreen(),
-           // const DoctorAppointmentsScreen(),
+            // const DoctorAppointmentsScreen(),
             const DoctorAppointmentPage(),
             // const ChatBotPage(),
             const DoctorProfilePage(),
