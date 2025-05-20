@@ -131,6 +131,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   String email = '';
   bool isLoading = true;
   int _upcomingCount = 0;
+  String profileImageUrl = '';
 
   // Initialize pages list in initState
   late final List<Widget> _pages;
@@ -139,7 +140,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   void initState() {
     super.initState();
     _pages = [
-      HomePage(fullName: fullName, upcomingCount: _upcomingCount),
+      HomePage(fullName: fullName, upcomingCount: _upcomingCount, profileImageUrl: profileImageUrl),
       const AppointmentPage(),
       const AiHealthBotScreen(),
       const ProfilePage(),
@@ -169,7 +170,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     setState(() {
       _upcomingCount = querySnapshot.docs.length;
       // Update the HomePage in the pages list with the new count
-      _pages[0] = HomePage(fullName: fullName, upcomingCount: _upcomingCount);
+      _pages[0] = HomePage(fullName: fullName, upcomingCount: _upcomingCount, profileImageUrl: profileImageUrl);
     });
   }
 
@@ -182,9 +183,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
         setState(() {
           fullName = doc['fullName'] ?? '';
           email = doc['email'] ?? '';
+          profileImageUrl = doc['profileImageUrl'] ?? '';
           isLoading = false;
           // Update the HomePage with the new name and count
-          _pages[0] = HomePage(fullName: fullName, upcomingCount: _upcomingCount);
+          _pages[0] =
+              HomePage(fullName: fullName, upcomingCount: _upcomingCount, profileImageUrl: profileImageUrl);
         });
       }
     } catch (e) {
@@ -213,7 +216,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today), label: 'Appointment'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.smart_toy_outlined), label: 'AI Chatbot'),
+              icon: Icon(Icons.smart_toy), label: 'AI Chatbot'),
           BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: 'Settings'),
         ],

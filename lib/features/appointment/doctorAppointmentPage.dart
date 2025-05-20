@@ -53,8 +53,8 @@ class DoctorAppointmentPage extends StatelessWidget {
                     context,
                     title: "My Appointment",
                     subtitle: "Check scheduled appointments",
-                    icon: Icons.health_and_safety,
-                    color: Colors.deepOrange,
+                    icon: Icons.calendar_today,
+                    color: Colors.blueAccent,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -72,8 +72,8 @@ class DoctorAppointmentPage extends StatelessWidget {
                     context,
                     title: "Upcoming Appointment",
                     subtitle: "Check pending appointments",
-                    icon: Icons.calendar_today_rounded,
-                    color: Colors.blueAccent,
+                    icon: Icons.pending_actions,
+                    color: Colors.green,
                     onTap: () {
                       Navigator.push(
                         context,
@@ -92,7 +92,7 @@ class DoctorAppointmentPage extends StatelessWidget {
                     title: "View Appointment History",
                     subtitle: "Check past appointments",
                     icon: Icons.history_rounded,
-                    color: Colors.green,
+                    color: Colors.orange[600]!,
                     onTap: () {
                       Navigator.push(
                         context,

@@ -53,6 +53,8 @@ dependencies:
   http: ^1.2.1
   flutter_svg: ^2.1.0
   url_launcher: ^6.2.5
+  table_calendar: ^3.0.8
+
 
 
 dev_dependencies:

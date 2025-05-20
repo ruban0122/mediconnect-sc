@@ -16,7 +16,8 @@ class _AiHealthBotScreenState extends State<AiHealthBotScreen> {
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
 
-  
+  final String _apiKey =
+      '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';
   final String _apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
   final String _model = 'llama3-70b-8192';
 

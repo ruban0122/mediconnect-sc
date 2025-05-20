@@ -16,11 +16,11 @@
 // }
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:mediconnect/features/aiHealthChatBotScreen.dart';
-import 'package:mediconnect/features/appointment/appointment_history_screen.dart';
+
 import 'package:mediconnect/features/appointment/doctor_list_screen.dart';
 import 'package:mediconnect/features/appointment/patientMyAppointmentsScreen.dart';
 import 'package:mediconnect/features/settingsScreen/HealthRecordScreen.dart';
@@ -29,12 +29,14 @@ import 'package:url_launcher/url_launcher.dart';
 class HomePage extends StatefulWidget {
   final String fullName;
   final int upcomingCount;
-  const HomePage({required this.fullName, required this.upcomingCount});
-
+  final String profileImageUrl;
+  const HomePage(
+      {required this.fullName,
+      required this.upcomingCount,
+      required this.profileImageUrl});
 
   @override
   State<HomePage> createState() => _HomePageState();
-  
 }
 
 class _HomePageState extends State<HomePage> {
@@ -44,21 +46,19 @@ class _HomePageState extends State<HomePage> {
   //final int upcomingAppointments = 2;
   final int pendingPrescriptions = 1;
   final int healthAlerts = 3;
- // int upcomingCount = 0;
-
-  
-
-
+  // int upcomingCount = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 10),
               // Header with user greeting
               _buildHeaderSection(),
               const SizedBox(height: 24),
@@ -96,44 +96,163 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHeaderSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Hi, ${widget.fullName}!",
-          style: const TextStyle(
-            fontSize: 23,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+    return Container(
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.blue.withOpacity(0.3),
+        //     blurRadius: 15,
+        //     //offset: const Offset(12, 40),
+        //   ),
+        // ],
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2B479A).withOpacity(0.3), // Use theme color
+            blurRadius: 15,
+            //spreadRadius: 1, // Adds subtle expansion
+            offset: const Offset(0, 4), // Subtle downward shadow
           ),
-        ),
-        //const SizedBox(height: 4),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: _getStatusColor(userHealthStatus),
-                borderRadius: BorderRadius.circular(20),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Left Side - User Info
+          Expanded(
+            child: Row(
+              children: [
+                // Profile Avatar with Status Indicator
+                Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      width: 62,
+                      height: 62,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: _getStatusColor(userHealthStatus),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: widget.profileImageUrl.isNotEmpty
+                            ? Image.network(
+                                widget.profileImageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    _buildDefaultAvatar(),
+                              )
+                            : _buildDefaultAvatar(),
+                      ),
+                    ),
+                    // Container(
+                    //   width: 14,
+                    //   height: 14,
+                    //   decoration: BoxDecoration(
+                    //     color: _getStatusColor(userHealthStatus),
+                    //     shape: BoxShape.circle,
+                    //     border: Border.all(
+                    //       color: Colors.white,
+                    //       width: 2,
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
+                ),
+                const SizedBox(width: 16),
+
+                // User Greeting and Role
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Welcome back,",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.fullName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2B479A), // Using your theme color
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color:
+                            _getStatusColor(userHealthStatus).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                          color: _getStatusColor(userHealthStatus),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        "Patient",
+                        style: TextStyle(
+                          color: _getStatusColor(userHealthStatus),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Right Side - Notification Icon with Badge
+          Stack(
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.notifications_outlined,
+                  color: Colors.grey[700],
+                  size: 28,
+                ),
+                onPressed: () {
+                  // Navigate to notifications screen
+                },
               ),
-              child: const Text(
-                "Patient",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
+              Positioned(
+                right: 10,
+                top: 10,
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ),
-            ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.notifications),
-              onPressed: () {
-                // Navigate to notifications
-              },
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDefaultAvatar() {
+    return Container(
+      color: Colors.grey[200],
+      child: const Icon(
+        Icons.person,
+        color: Colors.grey,
+        size: 32,
+      ),
     );
   }
 
@@ -223,7 +342,8 @@ class _HomePageState extends State<HomePage> {
         Row(
           children: [
             _buildInfoCard(
-              value: widget.upcomingCount.toString(), // Use widget.upcomingCount here
+              value: widget.upcomingCount
+                  .toString(), // Use widget.upcomingCount here
               label: "Upcoming Appointments",
               icon: Icons.calendar_today,
               color: Colors.purple[400]!,
@@ -235,16 +355,16 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            const SizedBox(width: 16),
-            _buildInfoCard(
-              value: pendingPrescriptions.toString(),
-              label: "Pending Prescriptions",
-              icon: Icons.description,
-              color: Colors.blue[400]!,
-              onTap: () {
-                // Navigate to prescriptions
-              },
-            ),
+            // const SizedBox(width: 16),
+            // _buildInfoCard(
+            //   value: pendingPrescriptions.toString(),
+            //   label: "Pending Prescriptions",
+            //   icon: Icons.description,
+            //   color: Colors.blue[400]!,
+            //   onTap: () {
+            //     // Navigate to prescriptions
+            //   },
+            // ),
           ],
         ),
         //const SizedBox(height: 16),
@@ -346,6 +466,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<String> fetchTodaysTip() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('healthTips')
+        .doc('daily_tips')
+        .get();
+
+    final tips = snapshot.data() as Map<String, dynamic>;
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year, 1, 1)).inDays;
+    final tipKey = 'tip${(dayOfYear % tips.length) + 1}'; // Cycles through tips
+
+    return tips[tipKey] ?? "Stay hydrated for better health!";
+  }
+
   Widget _buildHealthInsightsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -357,82 +491,142 @@ class _HomePageState extends State<HomePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        //const SizedBox(height: 16),
-        // SizedBox(
-        //   height: 180,
-        //   child: ListView(
-        //     scrollDirection: Axis.horizontal,
-        //     children: [
-        //       _buildInsightCard(
-        //         title: "Heart Rate Trend",
-        //         value: "72 bpm",
-        //         trend: Icons.trending_up,
-        //         trendColor: Colors.red,
-        //         onTap: () {
-        //           // View detailed heart rate
-        //         },
-        //       ),
-        //       const SizedBox(width: 12),
-        //       _buildInsightCard(
-        //         title: "Sleep Quality",
-        //         value: "7.2 hrs",
-        //         trend: Icons.trending_down,
-        //         trendColor: Colors.blue,
-        //         onTap: () {
-        //           // View sleep analysis
-        //         },
-        //       ),
-        //       const SizedBox(width: 12),
-        //       _buildInsightCard(
-        //         title: "Activity Level",
-        //         value: "8,245 steps",
-        //         trend: Icons.trending_up,
-        //         trendColor: Colors.green,
-        //         onTap: () {
-        //           // View activity details
-        //         },
-        //       ),
-        //     ],
-        //   ),
-        // ),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.blue[50],
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Today's Health Tip",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+        FutureBuilder<String>(
+          future: fetchTodaysTip(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+            final todaysTip = snapshot.data ?? "Stay healthy and active!";
+
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                "Drinking warm water with lemon in the morning can help digestion and boost immunity.",
-                style: TextStyle(fontSize: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Today's Health Tip",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    todaysTip,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 8),
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: TextButton(
+                  //     onPressed: () {
+                  //       // Navigate to a tips screen
+                  //     },
+                  //     child: const Text("More Tips"),
+                  //   ),
+                  // ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    // View more tips
-                  },
-                  child: const Text("More Tips"),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ],
     );
   }
+
+  // Widget _buildHealthInsightsSection() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text(
+  //         "Health Insights",
+  //         style: TextStyle(
+  //           fontSize: 20,
+  //           fontWeight: FontWeight.bold,
+  //         ),
+  //       ),
+  //       //const SizedBox(height: 16),
+  //       // SizedBox(
+  //       //   height: 180,
+  //       //   child: ListView(
+  //       //     scrollDirection: Axis.horizontal,
+  //       //     children: [
+  //       //       _buildInsightCard(
+  //       //         title: "Heart Rate Trend",
+  //       //         value: "72 bpm",
+  //       //         trend: Icons.trending_up,
+  //       //         trendColor: Colors.red,
+  //       //         onTap: () {
+  //       //           // View detailed heart rate
+  //       //         },
+  //       //       ),
+  //       //       const SizedBox(width: 12),
+  //       //       _buildInsightCard(
+  //       //         title: "Sleep Quality",
+  //       //         value: "7.2 hrs",
+  //       //         trend: Icons.trending_down,
+  //       //         trendColor: Colors.blue,
+  //       //         onTap: () {
+  //       //           // View sleep analysis
+  //       //         },
+  //       //       ),
+  //       //       const SizedBox(width: 12),
+  //       //       _buildInsightCard(
+  //       //         title: "Activity Level",
+  //       //         value: "8,245 steps",
+  //       //         trend: Icons.trending_up,
+  //       //         trendColor: Colors.green,
+  //       //         onTap: () {
+  //       //           // View activity details
+  //       //         },
+  //       //       ),
+  //       //     ],
+  //       //   ),
+  //       // ),
+  //       const SizedBox(height: 12),
+  //       Container(
+  //         padding: const EdgeInsets.all(16),
+  //         decoration: BoxDecoration(
+  //           color: Colors.blue[50],
+  //           borderRadius: BorderRadius.circular(12),
+  //         ),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             const Text(
+  //               "Today's Health Tip",
+  //               style: TextStyle(
+  //                 fontWeight: FontWeight.bold,
+  //                 fontSize: 16,
+  //               ),
+  //             ),
+  //             const SizedBox(height: 8),
+  //             const Text(
+  //               "Drinking warm water with lemon in the morning can help digestion and boost immunity.",
+  //               style: TextStyle(fontSize: 14),
+  //             ),
+  //             const SizedBox(height: 8),
+  //             Align(
+  //               alignment: Alignment.centerRight,
+  //               child: TextButton(
+  //                 onPressed: () {
+  //                   // View more tips
+  //                 },
+  //                 child: const Text("More Tips"),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildEmergencySection() {
     return Column(
@@ -743,7 +937,8 @@ class _HomePageState extends State<HomePage> {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'good':
-        return Colors.green;
+        return const Color(0xFF2B479A);
+
       case 'fair':
         return Colors.orange;
       case 'poor':
@@ -752,5 +947,4 @@ class _HomePageState extends State<HomePage> {
         return Colors.blue;
     }
   }
-
 }

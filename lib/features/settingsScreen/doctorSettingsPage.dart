@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mediconnect/features/appointment/doctor_availability_screen.dart';
 import 'package:mediconnect/features/registration/auth_service.dart';
 import 'package:mediconnect/features/settingsScreen/HealthRecordScreen.dart';
 import 'package:mediconnect/features/settingsScreen/MedicalInfoScreen.dart';
@@ -155,24 +156,28 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const DoctorEditProfileScreen()),
+                  MaterialPageRoute(
+                      builder: (_) => const DoctorEditProfileScreen()),
                 );
               },
             ),
-            // _profileOption(
-            //   title: "Medical Information",
-            //   icon: Icons.health_and_safety_outlined,
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (_) => const MedicalInfoScreen()),
-            //     );
-            //   },
-            // ),
+            _profileOption(
+              title: "My Schedule",
+              icon: Icons.calendar_month,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => DoctorAvailabilityScreen(
+                            doctorId: FirebaseAuth.instance.currentUser!.uid,
+                          )),
+                );
+              },
+            ),
             _profileOption(
               title: "Appointment History",
               icon: Icons.history,
-              onTap: () {                      
+              onTap: () {
                 // Navigator.push(
                 //         context,
                 //         MaterialPageRoute(
@@ -184,7 +189,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                 //           ),
                 //         ),
                 //       );
-                      },
+              },
             ),
 
             const SizedBox(height: 10),

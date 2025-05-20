@@ -27,15 +27,23 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
   DateTime selectedDate = DateTime.now();
   TimeOfDay? selectedTime;
   Set<String> bookedSlots = {};
+  Map<String, dynamic>? doctorAvailability;
+  List<String> availableSlots = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchBookedSlots();
+    _fetchInitialData();
+  }
+
+  Future<void> _fetchInitialData() async {
+    await _fetchDoctorAvailability();
+    await _fetchBookedSlots();
+    _generateAvailableSlots();
   }
 
   Future<void> _fetchBookedSlots() async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+    final querySnapshot = await FirebaseFirestore.instance
         .collection('appointments')
         .where('doctorId', isEqualTo: widget.doctorId)
         .where('dateTime',
@@ -51,9 +59,143 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
           .map((doc) => DateFormat('h:mm a')
               .format((doc['dateTime'] as Timestamp).toDate()))
           .toSet();
-      selectedTime = null; // Reset time selection when changing date
     });
   }
+
+  Future<void> _fetchDoctorAvailability() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('doctorAvailability')
+        .doc(widget.doctorId)
+        .get();
+
+    setState(() {
+      doctorAvailability = doc.data();
+    });
+  }
+
+  void _generateAvailableSlots() {
+    if (doctorAvailability == null) return;
+
+    final dateKey = selectedDate.toIso8601String().split('T')[0];
+    final defaultHours = doctorAvailability!['defaultHours'] as Map<String, dynamic>;
+    final exceptions = doctorAvailability!['exceptions'] as Map<String, dynamic>? ?? {};
+    final fullDayUnavailable = doctorAvailability!['fullDayUnavailable'] as Map<String, dynamic>? ?? {};
+
+    // Check if day is completely unavailable
+    if (fullDayUnavailable[dateKey] == true) {
+      setState(() {
+        availableSlots = [];
+        selectedTime = null;
+      });
+      return;
+    }
+
+    // Get default working hours
+    final defaultStart = _parseTimeString(defaultHours['start'] as String);
+    final defaultEnd = _parseTimeString(defaultHours['end'] as String);
+
+    // Check for time exceptions for this day
+    final dayExceptions = exceptions[dateKey] as List<dynamic>? ?? [];
+
+    // Generate all possible 30-minute slots within working hours
+    final slots = <String>[];
+    DateTime currentSlot = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      defaultStart.hour,
+      defaultStart.minute,
+    );
+
+    final endTime = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      defaultEnd.hour,
+      defaultEnd.minute,
+    );
+
+    while (currentSlot.isBefore(endTime)) {
+      final slotEnd = currentSlot.add(const Duration(minutes: 30));
+      
+      // Check if this slot falls within any exception time
+      bool isAvailable = true;
+      
+      for (final exception in dayExceptions) {
+        final exceptionStart = _parseTimeString(exception['start'] as String);
+        final exceptionEnd = _parseTimeString(exception['end'] as String);
+        
+        final exceptionStartDt = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          exceptionStart.hour,
+          exceptionStart.minute,
+        );
+        
+        final exceptionEndDt = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          exceptionEnd.hour,
+          exceptionEnd.minute,
+        );
+        
+        if ((currentSlot.isAfter(exceptionStartDt) && currentSlot.isBefore(exceptionEndDt)) ||
+            (slotEnd.isAfter(exceptionStartDt) && slotEnd.isBefore(exceptionEndDt)) ||
+            (currentSlot.isAtSameMomentAs(exceptionStartDt) && slotEnd.isAtSameMomentAs(exceptionEndDt))) {
+          isAvailable = false;
+          break;
+        }
+      }
+      
+      if (isAvailable) {
+        slots.add(DateFormat('h:mm a').format(currentSlot));
+      }
+      
+      currentSlot = currentSlot.add(const Duration(minutes: 30));
+    }
+
+    setState(() {
+      availableSlots = slots;
+    });
+  }
+
+  TimeOfDay _parseTimeString(String time) {
+    final parts = time.split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  }
+// class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
+//   DateTime selectedDate = DateTime.now();
+//   TimeOfDay? selectedTime;
+//   Set<String> bookedSlots = {};
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _fetchBookedSlots();
+//   }
+
+//   Future<void> _fetchBookedSlots() async {
+//     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+//         .collection('appointments')
+//         .where('doctorId', isEqualTo: widget.doctorId)
+//         .where('dateTime',
+//             isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime(
+//                 selectedDate.year, selectedDate.month, selectedDate.day)))
+//         .where('dateTime',
+//             isLessThan: Timestamp.fromDate(DateTime(
+//                 selectedDate.year, selectedDate.month, selectedDate.day + 1)))
+//         .get();
+
+//     setState(() {
+//       bookedSlots = querySnapshot.docs
+//           .map((doc) => DateFormat('h:mm a')
+//               .format((doc['dateTime'] as Timestamp).toDate()))
+//           .toSet();
+//       selectedTime = null; // Reset time selection when changing date
+//     });
+//   }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +274,7 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
     );
   }
 
+  // Update the date selection handler to refresh data
   Widget _buildDateSelector() {
     return SizedBox(
       height: 70,
@@ -143,11 +286,13 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
           bool isSelected = date.day == selectedDate.day;
 
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
               setState(() {
                 selectedDate = date;
-                _fetchBookedSlots();
+                selectedTime = null; // Reset time selection when changing date
               });
+              await _fetchBookedSlots();
+              _generateAvailableSlots();
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
@@ -178,28 +323,37 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
   }
 
   Widget _buildTimeSelector() {
-    List<String> availableTimes = [];
+    // Generate all possible 30-minute slots from 10am to 10pm
+    List<String> allPossibleSlots = [];
     for (int hour = 10; hour < 22; hour++) {
-      availableTimes.add(
+      allPossibleSlots.add(
           "${hour % 12 == 0 ? 12 : hour % 12}:00 ${hour < 12 ? 'AM' : 'PM'}");
-      availableTimes.add(
+      allPossibleSlots.add(
           "${hour % 12 == 0 ? 12 : hour % 12}:30 ${hour < 12 ? 'AM' : 'PM'}");
     }
 
     return Wrap(
       spacing: 10,
       runSpacing: 10,
-      children: availableTimes.map((time) {
+      children: allPossibleSlots.map((time) {
+        // Check if this slot is available (not in exceptions and within working hours)
+        bool isAvailable = availableSlots.contains(time);
+        
+        // Check if this slot is already booked
         bool isBooked = bookedSlots.contains(time);
+        
+        // Determine if the slot is selectable
+        bool isSelectable = isAvailable && !isBooked;
+        
+        // Check if this slot is currently selected
         bool isSelected = selectedTime != null &&
             DateFormat('h:mm a').format(DateTime(
                     0, 0, 0, selectedTime!.hour, selectedTime!.minute)) ==
                 time;
 
         return GestureDetector(
-          onTap: isBooked
-              ? null
-              : () {
+          onTap: isSelectable
+              ? () {
                   setState(() {
                     int hour = int.parse(time.split(":")[0]) +
                         (time.contains("PM") && !time.startsWith("12")
@@ -208,7 +362,8 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
                     int minute = int.parse(time.split(":")[1].split(" ")[0]);
                     selectedTime = TimeOfDay(hour: hour, minute: minute);
                   });
-                },
+                }
+              : null,
           child: SizedBox(
             width: 80,
             height: 50,
@@ -217,8 +372,8 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
               decoration: BoxDecoration(
                 color: isSelected
                     ? const Color(0xFF2B479A)
-                    : isBooked
-                        ? Colors.grey.shade300
+                    : !isSelectable
+                        ? Colors.grey.shade200
                         : Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
@@ -226,20 +381,153 @@ class _SelectDateTimeScreenState extends State<SelectDateTimeScreen> {
                         ? const Color(0xFF2B479A)
                         : Colors.grey.shade300),
               ),
-              child: Text(time,
-                  style: TextStyle(
-                      color: isBooked
-                          ? Colors.grey
-                          : isSelected
-                              ? Colors.white
-                              : Colors.black,
-                      fontWeight: FontWeight.bold)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(time,
+                      style: TextStyle(
+                          color: !isSelectable
+                              ? Colors.grey
+                              : isSelected
+                                  ? Colors.white
+                                  : Colors.black,
+                          fontWeight: FontWeight.bold)),
+                  if (!isSelectable)
+                    const Text("Unavailable",
+                        style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10,
+                            fontWeight: FontWeight.normal)),
+                ],
+              ),
             ),
           ),
         );
       }).toList(),
     );
   }
+
+
+  //   Widget _buildTimeSelector() {
+  //   return Wrap(
+  //     spacing: 10,
+  //     runSpacing: 10,
+  //     children: availableSlots.map((time) {
+  //       bool isBooked = bookedSlots.contains(time);
+  //       bool isSelected = selectedTime != null &&
+  //           DateFormat('h:mm a').format(DateTime(
+  //                   0, 0, 0, selectedTime!.hour, selectedTime!.minute)) ==
+  //               time;
+
+  //       return GestureDetector(
+  //         onTap: isBooked
+  //             ? null
+  //             : () {
+  //                 setState(() {
+  //                   int hour = int.parse(time.split(":")[0]) +
+  //                       (time.contains("PM") && !time.startsWith("12")
+  //                           ? 12
+  //                           : 0);
+  //                   int minute = int.parse(time.split(":")[1].split(" ")[0]);
+  //                   selectedTime = TimeOfDay(hour: hour, minute: minute);
+  //                 });
+  //               },
+  //         child: SizedBox(
+  //           width: 80,
+  //           height: 50,
+  //           child: Container(
+  //             alignment: Alignment.center,
+  //             decoration: BoxDecoration(
+  //               color: isSelected
+  //                   ? const Color(0xFF2B479A)
+  //                   : isBooked
+  //                       ? Colors.grey.shade300
+  //                       : Colors.white,
+  //               borderRadius: BorderRadius.circular(10),
+  //               border: Border.all(
+  //                   color: isSelected
+  //                       ? const Color(0xFF2B479A)
+  //                       : Colors.grey.shade300),
+  //             ),
+  //             child: Text(time,
+  //                 style: TextStyle(
+  //                     color: isBooked
+  //                         ? Colors.grey
+  //                         : isSelected
+  //                             ? Colors.white
+  //                             : Colors.black,
+  //                     fontWeight: FontWeight.bold)),
+  //           ),
+  //         ),
+  //       );
+  //     }).toList(),
+  //   );
+  // }
+
+
+  // Widget _buildTimeSelector() {
+  //   List<String> availableTimes = [];
+  //   for (int hour = 10; hour < 22; hour++) {
+  //     availableTimes.add(
+  //         "${hour % 12 == 0 ? 12 : hour % 12}:00 ${hour < 12 ? 'AM' : 'PM'}");
+  //     availableTimes.add(
+  //         "${hour % 12 == 0 ? 12 : hour % 12}:30 ${hour < 12 ? 'AM' : 'PM'}");
+  //   }
+
+  //   return Wrap(
+  //     spacing: 10,
+  //     runSpacing: 10,
+  //     children: availableTimes.map((time) {
+  //       bool isBooked = bookedSlots.contains(time);
+  //       bool isSelected = selectedTime != null &&
+  //           DateFormat('h:mm a').format(DateTime(
+  //                   0, 0, 0, selectedTime!.hour, selectedTime!.minute)) ==
+  //               time;
+
+  //       return GestureDetector(
+  //         onTap: isBooked
+  //             ? null
+  //             : () {
+  //                 setState(() {
+  //                   int hour = int.parse(time.split(":")[0]) +
+  //                       (time.contains("PM") && !time.startsWith("12")
+  //                           ? 12
+  //                           : 0);
+  //                   int minute = int.parse(time.split(":")[1].split(" ")[0]);
+  //                   selectedTime = TimeOfDay(hour: hour, minute: minute);
+  //                 });
+  //               },
+  //         child: SizedBox(
+  //           width: 80,
+  //           height: 50,
+  //           child: Container(
+  //             alignment: Alignment.center,
+  //             decoration: BoxDecoration(
+  //               color: isSelected
+  //                   ? const Color(0xFF2B479A)
+  //                   : isBooked
+  //                       ? Colors.grey.shade300
+  //                       : Colors.white,
+  //               borderRadius: BorderRadius.circular(10),
+  //               border: Border.all(
+  //                   color: isSelected
+  //                       ? const Color(0xFF2B479A)
+  //                       : Colors.grey.shade300),
+  //             ),
+  //             child: Text(time,
+  //                 style: TextStyle(
+  //                     color: isBooked
+  //                         ? Colors.grey
+  //                         : isSelected
+  //                             ? Colors.white
+  //                             : Colors.black,
+  //                     fontWeight: FontWeight.bold)),
+  //           ),
+  //         ),
+  //       );
+  //     }).toList(),
+  //   );
+  // }
 
   Widget _buildConfirmButton() {
     return ElevatedButton(
