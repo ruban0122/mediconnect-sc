@@ -75,9 +75,9 @@ class _ProfilePageState extends State<ProfilePage> {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          "Profile",
+          "My Profile",
           style: TextStyle(
-            color: Colors.black,
+            color: Color(0xFF2B479A),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -148,6 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // User Information Section
             _sectionTitle("User Information"),
+            const SizedBox(height: 10),
             _profileOption(
               title: "My Profile",
               icon: Icons.person_outline,
@@ -178,6 +179,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // Settings Section
             _sectionTitle("Settings"),
+            const SizedBox(height: 10),
             _profileOption(
               title: "Manage Notification",
               icon: Icons.notifications_outlined,
@@ -205,21 +207,32 @@ class _ProfilePageState extends State<ProfilePage> {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        onTap: onTap,
-        leading: Icon(icon, color: const Color(0xFF2B479A), size: 28),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blueAccent.withOpacity(0.2), // Blue glow
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
-        trailing:
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        child: ListTile(
+          leading: Icon(icon, color: const Color(0xFF2B479A), size: 28),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          trailing:
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        ),
       ),
     );
   }

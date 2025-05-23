@@ -438,7 +438,8 @@ class _PatientAppointmentDetailScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildPatientHeader(doctorName, doctorEmail, doctorImage),
+                _buildPatientHeader(
+                    'Dr. $doctorName', doctorEmail, doctorImage),
                 const SizedBox(height: 24),
                 _buildSectionTitle("Appointment Information"),
                 const SizedBox(height: 20),
@@ -450,9 +451,15 @@ class _PatientAppointmentDetailScreenState
                   _buildInfoTile(_getMethodIcon(method), "Type",
                       method.replaceAll('_', ' ').toUpperCase()),
                   _buildInfoTile(Icons.attach_money, "Fee", price.toString()),
+                  _buildInfoTileWithWidget(
+                      Icons.info, "Status", _buildStatusBadge(status)),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(top: 12),
+                  //   child: Center(child: _buildStatusBadge(status)),
+                  // ),
                 ]),
-                const SizedBox(height: 24),
-                Center(child: _buildStatusBadge(status)),
+                // const SizedBox(height: 24),
+                // Center(child: _buildStatusBadge(status)),
                 const SizedBox(height: 24),
                 if (status == 'pending') _buildActionButtons(),
                 if ((status == 'confirmed' || status == 'in_progress') &&
@@ -506,6 +513,27 @@ class _PatientAppointmentDetailScreenState
     return Text(title,
         style: const TextStyle(
             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey));
+  }
+
+  Widget _buildInfoTileWithWidget(
+      IconData icon, String title, Widget subtitleWidget) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFF2B479A)),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey)),
+              subtitleWidget,
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildPatientHeader(String name, String email, String? imageUrl) {

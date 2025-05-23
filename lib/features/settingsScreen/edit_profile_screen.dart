@@ -113,15 +113,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         title: const Text(
           'My Profile',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2B479A)),
         ),
         centerTitle: true,
         elevation: 0,
@@ -287,10 +287,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   boxShadow: [
                     // Add shadow
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 6,
-                      spreadRadius: 1,
-                      offset: Offset(0, 2),
+                      color: Colors.blueAccent.withOpacity(0.2), // Blue glow
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -346,14 +346,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: Colors.grey),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[600],
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text(
-                        "Cancel",
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                      child: const Text("Cancel",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -361,13 +364,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: ElevatedButton(
                       onPressed: _saveProfile,
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.blue,
+                        backgroundColor: const Color(0xFF2B479A),
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text(
-                        "Update",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child: const Text("Update",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                     ),
                   ),
                 ],
@@ -389,11 +395,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
+            color: Colors.blueAccent.withOpacity(0.2), // Blue glow
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -413,7 +420,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: Colors.blue),
+            borderSide: const BorderSide(color: Color(0xFF2B479A)),
           ),
         ),
         keyboardType: keyboardType,

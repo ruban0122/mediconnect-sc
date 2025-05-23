@@ -93,9 +93,11 @@ class _DoctorAppointmentDetailScreenState
                   _buildInfoTile(_getMethodIcon(method), "Type",
                       method.replaceAll('_', ' ').toUpperCase()),
                   _buildInfoTile(Icons.attach_money, "Fee", price.toString()),
+                  _buildInfoTileWithWidget(
+                      Icons.info, "Status", _buildStatusBadge(status)),
                 ]),
-                const SizedBox(height: 24),
-                Center(child: _buildStatusBadge(status)),
+                // const SizedBox(height: 24),
+                // Center(child: _buildStatusBadge(status)),
                 const SizedBox(height: 24),
                 if (status == 'pending') _buildActionButtons(),
                 if ((status == 'confirmed' || status == 'in_progress') &&
@@ -148,6 +150,27 @@ class _DoctorAppointmentDetailScreenState
     return Text(title,
         style: const TextStyle(
             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey));
+  }
+
+  Widget _buildInfoTileWithWidget(
+      IconData icon, String title, Widget subtitleWidget) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFF2B479A)),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey)),
+              subtitleWidget,
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildPatientHeader(String name, String email, String? imageUrl) {
@@ -257,20 +280,64 @@ class _DoctorAppointmentDetailScreenState
     );
   }
 
+  // Widget _actionButton({
+  //   required String label,
+  //   required Color color,
+  //   required VoidCallback onTap,
+  // }) {
+  //   return TextButton(
+  //     onPressed: onTap,
+  //     style: TextButton.styleFrom(
+  //       backgroundColor: color.withOpacity(0.1),
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  //     ),
+  //     child: Text(label,
+  //         style: TextStyle(
+  //             color: color, fontSize: 16, fontWeight: FontWeight.bold)),
+  //   );
+  // }
   Widget _actionButton({
     required String label,
     required Color color,
     required VoidCallback onTap,
+    IconData? icon,
   }) {
-    return TextButton(
-      onPressed: onTap,
-      style: TextButton.styleFrom(
-        backgroundColor: color.withOpacity(0.1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      splashColor: color.withOpacity(0.2),
+      highlightColor: Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 8),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
-      child: Text(label,
-          style: TextStyle(
-              color: color, fontSize: 16, fontWeight: FontWeight.bold)),
     );
   }
 
@@ -279,15 +346,16 @@ class _DoctorAppointmentDetailScreenState
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _actionButton(
-          label: "Confirm",
-          color: Colors.green,
-          onTap: () => _updateStatus('confirmed'),
-        ),
-        const SizedBox(width: 30),
-        _actionButton(
           label: "Cancel",
           color: Colors.red,
           onTap: () => _updateStatus('cancelled'),
+        ),
+        const SizedBox(width: 30),
+        _actionButton(
+          label: "Confirm",
+          color: Colors.green,
+          onTap: () => _updateStatus('confirmed'),
+          icon: Icons.check,
         ),
       ],
     );

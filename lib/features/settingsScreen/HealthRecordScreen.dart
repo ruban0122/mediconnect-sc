@@ -44,9 +44,9 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
@@ -54,12 +54,15 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
         ),
         title: const Text(
           'Medical Information',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2B479A)),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit, color: Colors.black),
+            icon: const Icon(Icons.edit, color: Color(0xFF2B479A)),
             onPressed: () => Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -75,24 +78,54 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
               ? const Center(child: Text("No health record found."))
               : Padding(
                   padding: const EdgeInsets.all(16),
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.8,
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start, // Align text to the start
                     children: [
-                      _buildInfoCard(Icons.height, "Height",
-                          "${healthData?['height']} ", Colors.blue),
-                      _buildInfoCard(Icons.monitor_weight, "Weight",
-                          "${healthData?['weight']} ", Colors.green),
-                      _buildInfoCard(Icons.bloodtype, "Blood Type",
-                          healthData?['bloodType'] ?? "N/A", Colors.red),
-                      _buildInfoCard(Icons.warning, "Chronic",
-                          healthData?['chronic'] ?? "N/A", Colors.orange),
-                      _buildInfoCard(Icons.medication, "Allergies",
-                          healthData?['allergies'] ?? "N/A", Colors.purple),
-                      _buildInfoCard(Icons.medical_services, "Medications",
-                          healthData?['medications'] ?? "N/A", Colors.teal),
+                      // Add your text here
+                      const Text(
+                        'Health Record',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(
+                          height: 16), // Add some spacing between text and grid
+
+                      // Your existing GridView
+                      Expanded(
+                        child: GridView.count(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 1.8,
+                          children: [
+                            _buildInfoCard(Icons.height, "Height",
+                                "${healthData?['height']} ", Colors.blue),
+                            _buildInfoCard(Icons.monitor_weight, "Weight",
+                                "${healthData?['weight']} ", Colors.green),
+                            _buildInfoCard(Icons.bloodtype, "Blood Type",
+                                healthData?['bloodType'] ?? "N/A", Colors.red),
+                            _buildInfoCard(
+                                Icons.warning,
+                                "Chronic",
+                                healthData?['chronicDiseases'] ?? "N/A",
+                                Colors.orange),
+                            _buildInfoCard(
+                                Icons.medication,
+                                "Allergies",
+                                healthData?['allergies'] ?? "N/A",
+                                Colors.purple),
+                            _buildInfoCard(
+                                Icons.medical_services,
+                                "Medications",
+                                healthData?['medications'] ?? "N/A",
+                                Colors.teal),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -100,7 +133,19 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
   }
 
   Widget _buildInfoCard(
-      IconData icon, String title, String value, Color iconColor) {
+      IconData icon, String title, dynamic value, Color iconColor) {
+    // Convert value to display string
+    String displayValue;
+    if (value == null) {
+      displayValue = "N/A";
+    } else if (value is List) {
+      displayValue = value.isEmpty ? "None" : value.join(", ");
+    } else if (value is String) {
+      displayValue = value.isEmpty ? "N/A" : value;
+    } else {
+      displayValue = value.toString();
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -123,7 +168,7 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          Text(value,
+          Text(displayValue,
               style:
                   const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
         ],

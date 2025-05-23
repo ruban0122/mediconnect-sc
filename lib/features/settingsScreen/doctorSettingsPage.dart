@@ -3,11 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mediconnect/features/appointment/doctor_availability_screen.dart';
 import 'package:mediconnect/features/registration/auth_service.dart';
-import 'package:mediconnect/features/settingsScreen/HealthRecordScreen.dart';
-import 'package:mediconnect/features/settingsScreen/MedicalInfoScreen.dart';
 import 'package:mediconnect/features/settingsScreen/account_settings_page.dart';
 import 'package:mediconnect/features/settingsScreen/doctorEditProfileScreen.dart';
-import 'package:mediconnect/features/settingsScreen/health_record_screen.dart';
 import 'package:provider/provider.dart';
 import 'edit_profile_screen.dart';
 
@@ -71,15 +68,17 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      //backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F7FA),
+        // backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          "Profile",
+          "My Profile",
           style: TextStyle(
-            color: Colors.black,
+            color: Color(0xFF2B479A),
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -136,7 +135,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  fullName,
+                  'Dr. $fullName',
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -146,10 +145,11 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             // User Information Section
             _sectionTitle("User Information"),
+            const SizedBox(height: 10),
             _profileOption(
               title: "My Profile",
               icon: Icons.person_outline,
@@ -177,25 +177,14 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
             _profileOption(
               title: "Appointment History",
               icon: Icons.history,
-              onTap: () {
-                // Navigator.push(
-                //         context,
-                //         MaterialPageRoute(
-                //           builder: (context) => const VideoCallScreen(
-                //             channelName:
-                //                 "mediconnect", // 🔴 Replace with the actual channel name
-                //             token:
-                //                 "007eJxTYDg3j4f1yp1NPToSseGuutN59uYvfdaYrnHr64PpLTfjo88qMCSaWKakWhgZGllYGpgkm6UkGRqkmlhYmBomJSUaJpmarq55m94QyMiw5b85EyMDBIL43Ay5qSmZyfl5eanJJQwMAIHXI9c=", // 🔴 Replace with a valid Agora token
-                //           ),
-                //         ),
-                //       );
-              },
+              onTap: () {},
             ),
 
             const SizedBox(height: 10),
 
             // Settings Section
             _sectionTitle("Settings"),
+            const SizedBox(height: 10),
             _profileOption(
               title: "Manage Notification",
               icon: Icons.notifications_outlined,
@@ -218,26 +207,60 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     );
   }
 
+  // Widget _profileOption({
+  //   required String title,
+  //   required IconData icon,
+  //   required VoidCallback onTap,
+  // }) {
+  //   return Container(
+  //     margin: const EdgeInsets.only(bottom: 12),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: ListTile(
+  //       onTap: onTap,
+  //       leading: Icon(icon, color: const Color(0xFF2B479A), size: 28),
+  //       title: Text(
+  //         title,
+  //         style: const TextStyle(fontWeight: FontWeight.w600),
+  //       ),
+  //       trailing:
+  //           const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+  //     ),
+  //   );
+  // }
   Widget _profileOption({
     required String title,
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        onTap: onTap,
-        leading: Icon(icon, color: const Color(0xFF2B479A), size: 28),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blueAccent.withOpacity(0.2), // Blue glow
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
-        trailing:
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        child: ListTile(
+          leading: Icon(icon, color: const Color(0xFF2B479A), size: 28),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          trailing:
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        ),
       ),
     );
   }

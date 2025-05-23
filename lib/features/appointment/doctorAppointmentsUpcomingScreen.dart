@@ -193,24 +193,24 @@ class _DoctorAppointmentsUpcomingScreenState
                           ),
                           const SizedBox(height: 10),
                           if (appointment['status'] == 'pending') ...[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _actionButton(
-                                  label: "Confirm",
-                                  color: Colors.green,
-                                  onTap: () => _updateStatus(
-                                      appointment.id, 'confirmed'),
-                                ),
-                                const SizedBox(width: 20),
-                                _actionButton(
-                                  label: "Cancel",
-                                  color: Colors.red,
-                                  onTap: () => _updateStatus(
-                                      appointment.id, 'cancelled'),
-                                ),
-                              ],
-                            ),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.center,
+                            //   children: [
+                            //     _actionButton(
+                            //       label: "Cancel",
+                            //       color: Colors.red,
+                            //       onTap: () => _updateStatus(
+                            //           appointment.id, 'cancelled'),
+                            //     ),
+                            //     const SizedBox(width: 20),
+                            //     _actionButton(
+                            //       label: "Confirm",
+                            //       color: Colors.green,
+                            //       onTap: () => _updateStatus(
+                            //           appointment.id, 'confirmed'),
+                            //     ),
+                            //   ],
+                            // ),
                           ]
                         ],
                       ),

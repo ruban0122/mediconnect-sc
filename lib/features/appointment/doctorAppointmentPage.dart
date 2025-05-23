@@ -70,8 +70,8 @@ class DoctorAppointmentPage extends StatelessWidget {
                   // 📅 Book Appointment
                   _buildOptionCard(
                     context,
-                    title: "Upcoming Appointment",
-                    subtitle: "Check pending appointments",
+                    title: "Pending Appointment",
+                    subtitle: "Check pending approval appointments",
                     icon: Icons.pending_actions,
                     color: Colors.green,
                     onTap: () {

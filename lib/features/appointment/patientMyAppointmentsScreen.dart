@@ -171,7 +171,7 @@ class _PatientMyAppointmentsScreenState
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      doctorName,
+                                      'Dr. $doctorName',
                                       style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
