@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mediconnect/features/appointment/appointment_history_screen.dart';
+import 'package:mediconnect/features/appointment/doctorAppointmentsHistoryScreen.dart';
 import 'package:mediconnect/features/registration/auth_service.dart';
 import 'package:mediconnect/features/settingsScreen/HealthRecordScreen.dart';
 import 'package:mediconnect/features/settingsScreen/MedicalInfoScreen.dart';
@@ -172,7 +174,13 @@ class _ProfilePageState extends State<ProfilePage> {
             _profileOption(
               title: "Appointment History",
               icon: Icons.history,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const AppointmentHistoryScreen()),
+                );
+              },
             ),
 
             const SizedBox(height: 10),
@@ -180,11 +188,11 @@ class _ProfilePageState extends State<ProfilePage> {
             // Settings Section
             _sectionTitle("Settings"),
             const SizedBox(height: 10),
-            _profileOption(
-              title: "Manage Notification",
-              icon: Icons.notifications_outlined,
-              onTap: () {},
-            ),
+            // _profileOption(
+            //   title: "Manage Notification",
+            //   icon: Icons.notifications_outlined,
+            //   onTap: () {},
+            // ),
             _profileOption(
               title: "Account Setting",
               icon: Icons.settings_outlined,

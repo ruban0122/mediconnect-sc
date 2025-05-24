@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:mediconnect/features/settingsScreen/change_password_screen.dart';
 import '../login/login_screen.dart';
 
 class AccountSettingsPage extends StatefulWidget {
@@ -87,15 +88,15 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: const Text("Account Settings"),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 1,
+        //elevation: 1,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         iconTheme: const IconThemeData(color: Colors.black),
         titleTextStyle: const TextStyle(
-          color: Colors.black,
+          color: Color(0xFF2B479A),
           fontSize: 18,
           fontWeight: FontWeight.w600,
         ),
@@ -104,11 +105,11 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           children: [
-            _buildSettingCard(
-              title: "Privacy & Security",
-              icon: Icons.lock_outline,
-              onTap: () {},
-            ),
+            // _buildSettingCard(
+            //   title: "Privacy & Security",
+            //   icon: Icons.lock_outline,
+            //   onTap: () {},
+            // ),
             // _buildSettingCard(
             //   title: "Notifications",
             //   icon: Icons.notifications_none,
@@ -117,9 +118,15 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
             _buildSettingCard(
               title: "Change Password",
               icon: Icons.password_outlined,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ChangePasswordScreen()),
+                );
+              },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             _buildDeleteAccountCard(),
           ],
         ),
@@ -132,16 +139,32 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        onTap: onTap,
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        leading: Icon(icon, color: const Color(0xFF2B479A), size: 28),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing:
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blueAccent.withOpacity(0.2), // Blue glow
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: ListTile(
+          leading: Icon(icon, color: const Color(0xFF2B479A), size: 28),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          trailing:
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        ),
       ),
     );
   }

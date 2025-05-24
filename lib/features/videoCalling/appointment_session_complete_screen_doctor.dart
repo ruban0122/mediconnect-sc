@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mediconnect/features/DoctorHomePage.dart';
 import 'package:mediconnect/features/main_app_screen.dart';
-import 'appointment_page.dart';
 
-class BookingSuccessScreen extends StatelessWidget {
-  const BookingSuccessScreen({super.key});
+class AppointmentCompleteScreenDoctor extends StatelessWidget {
+  const AppointmentCompleteScreenDoctor({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +18,13 @@ class BookingSuccessScreen extends StatelessWidget {
               const Icon(Icons.check_circle, color: Colors.green, size: 80),
               const SizedBox(height: 20),
               const Text(
-                "Appointment Booked Successfully!",
+                "Consultation Session Completed!",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               const Text(
-                "Your appointment has been confirmed. You can view it in your appointment history.",
+                "Your appointment has been completed. You can view it in your appointment history.",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
@@ -36,7 +36,7 @@ class BookingSuccessScreen extends StatelessWidget {
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const HomePageScreen(
+                        builder: (context) => const DocHomePage(
                             initialTab: 1)), // Assuming 1 is appointments tab
                     (route) => false,
                   );

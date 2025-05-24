@@ -98,7 +98,8 @@ import 'package:mediconnect/features/login/home_page.dart';
 import 'package:mediconnect/features/settingsScreen/doctorSettingsPage.dart';
 
 class DocHomePage extends StatefulWidget {
-  const DocHomePage({super.key});
+  const DocHomePage({super.key, this.initialTab = 0});
+  final int initialTab;
 
   @override
   State<DocHomePage> createState() => _DocHomePageState();
@@ -118,8 +119,12 @@ class _DocHomePageState extends State<DocHomePage> {
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialTab;
     _pages = [
-      DoctorHomePage(fullName: fullName, upcomingCount: _upcomingCount, profileImageUrl: profileImageUrl),
+      DoctorHomePage(
+          fullName: fullName,
+          upcomingCount: _upcomingCount,
+          profileImageUrl: profileImageUrl),
       const DoctorAppointmentPage(),
       const DoctorProfilePage(),
     ];
@@ -148,8 +153,10 @@ class _DocHomePageState extends State<DocHomePage> {
     setState(() {
       _upcomingCount = querySnapshot.docs.length;
       // Update the HomePage in the pages list with the new count
-      _pages[0] =
-          DoctorHomePage(fullName: fullName, upcomingCount: _upcomingCount, profileImageUrl: profileImageUrl);
+      _pages[0] = DoctorHomePage(
+          fullName: fullName,
+          upcomingCount: _upcomingCount,
+          profileImageUrl: profileImageUrl);
     });
   }
 
@@ -166,8 +173,10 @@ class _DocHomePageState extends State<DocHomePage> {
 
           isLoading = false;
           // Update the HomePage with the new name and count
-          _pages[0] =
-              DoctorHomePage(fullName: fullName, upcomingCount: _upcomingCount, profileImageUrl: profileImageUrl);
+          _pages[0] = DoctorHomePage(
+              fullName: fullName,
+              upcomingCount: _upcomingCount,
+              profileImageUrl: profileImageUrl);
         });
       }
     } catch (e) {

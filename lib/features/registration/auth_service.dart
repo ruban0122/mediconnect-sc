@@ -4,7 +4,6 @@
 // class AuthService {
 //   final FirebaseAuth _auth = FirebaseAuth.instance;
 //   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
 
 //   Future<bool> registerUser(
 //     String email,
@@ -104,7 +103,7 @@
 //         'email': email,
 //         'dob': dob,
 //         'gender': gender,
-//         'accountType': 'patient', 
+//         'accountType': 'patient',
 //         'uid': userCredential.user!.uid,
 //         'createdAt': FieldValue.serverTimestamp(),
 //       });
@@ -147,11 +146,11 @@
 //   }
 // }
 
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -202,7 +201,8 @@ class AuthService extends ChangeNotifier {
     String gender,
   ) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -215,7 +215,7 @@ class AuthService extends ChangeNotifier {
         'email': email,
         'dob': dob,
         'gender': gender,
-        'accountType': 'patient', 
+        'accountType': 'patient',
         'uid': userCredential.user!.uid,
         'fcmToken': fcmToken, // Add FCM token to user document
         'lastTokenUpdate': FieldValue.serverTimestamp(),
@@ -229,6 +229,25 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  // Future<Map<String, dynamic>?> loginUser(String email, String password) async {
+  //   try {
+  //     final UserCredential userCred = await _auth.signInWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
+
+  //     // Update FCM token on login
+  //     await _updateFcmToken(userCred.user!.uid);
+
+  //     final uid = userCred.user!.uid;
+  //     final userDoc = await _firestore.collection('users').doc(uid).get();
+  //     return userDoc.data();
+  //   } catch (e) {
+  //     print("Login error: $e");
+  //     return null;
+  //   }
+  // }
+
   Future<Map<String, dynamic>?> loginUser(String email, String password) async {
     try {
       final UserCredential userCred = await _auth.signInWithEmailAndPassword(
@@ -236,11 +255,16 @@ class AuthService extends ChangeNotifier {
         password: password,
       );
 
-      // Update FCM token on login
       await _updateFcmToken(userCred.user!.uid);
 
       final uid = userCred.user!.uid;
       final userDoc = await _firestore.collection('users').doc(uid).get();
+
+      // Save role to SharedPreferences
+      final role = userDoc.data()?['accountType'];
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('accountType', role);
+
       return userDoc.data();
     } catch (e) {
       print("Login error: $e");
@@ -258,7 +282,13 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  // Future<void> signOut() async {
+  //   await _auth.signOut();
+  // }
+
   Future<void> signOut() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('accountType');
     await _auth.signOut();
   }
 

@@ -369,6 +369,10 @@ class AppointmentHistoryScreen extends StatelessWidget {
         bgColor = Colors.blue.shade100;
         textColor = Colors.blue;
         break;
+      case 'completed':
+        bgColor = Colors.blue.shade100;
+        textColor = Colors.blue;
+        break;
       default:
         bgColor = Colors.grey.shade200;
         textColor = Colors.black;

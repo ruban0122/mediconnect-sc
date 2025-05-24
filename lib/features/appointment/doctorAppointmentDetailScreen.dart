@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mediconnect/features/videoCalling/chatting/chat_screen.dart';
+import 'package:mediconnect/features/chatting/chat_screen.dart';
 import 'package:mediconnect/features/videoCalling/video_call_screen.dart';
 import 'package:mediconnect/notification_service.dart';
 
@@ -115,7 +115,7 @@ class _DoctorAppointmentDetailScreenState
                                   appointmentId: widget.appointment.id,
                                   otherUserId: widget.appointment['patientId'],
                                   otherUserName: patientName,
-                                  otherUserImageUrl: patientImage,
+                                  otherUserImageUrl: patientImage, userRole: 'doctor',
                                 ),
                               ),
                             )

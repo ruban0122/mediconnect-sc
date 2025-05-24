@@ -360,7 +360,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mediconnect/features/videoCalling/chatting/chat_screen.dart';
+import 'package:mediconnect/features/chatting/chat_screen.dart';
 import 'package:mediconnect/features/videoCalling/video_call_screen.dart';
 import 'package:mediconnect/notification_service.dart';
 
@@ -478,6 +478,7 @@ class _PatientAppointmentDetailScreenState
                                     otherUserId: widget.appointment['doctorId'],
                                     otherUserName: doctorName,
                                     otherUserImageUrl: doctorImage,
+                                    userRole: '',
                                   ),
                                 ),
                               )
