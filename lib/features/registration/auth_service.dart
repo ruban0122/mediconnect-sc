@@ -193,60 +193,70 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  // Future<bool> registerUser(
+  //   String email,
+  //   String password,
+  //   String fullName,
+  //   String dob,
+  //   String gender,
+  // ) async {
+  //   try {
+  //     UserCredential userCredential =
+  //         await _auth.createUserWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
+
+  //     // Get FCM token for the new user
+  //     String? fcmToken = await _fcm.getToken();
+
+  //     await _firestore.collection('users').doc(userCredential.user!.uid).set({
+  //       'fullName': fullName,
+  //       'email': email,
+  //       'dob': dob,
+  //       'gender': gender,
+  //       'accountType': 'patient',
+  //       'uid': userCredential.user!.uid,
+  //       'fcmToken': fcmToken, // Add FCM token to user document
+  //       'lastTokenUpdate': FieldValue.serverTimestamp(),
+  //       'createdAt': FieldValue.serverTimestamp(),
+  //     });
+
+  //     return true;
+  //   } catch (e) {
+  //     print("Registration error: $e");
+  //     return false;
+  //   }
+  // }
+
   Future<bool> registerUser(
     String email,
     String password,
     String fullName,
     String dob,
-    String gender,
-  ) async {
+    String gender, {
+    String accountType = 'patient',
+  }) async {
     try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
+      final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      // Get FCM token for the new user
-      String? fcmToken = await _fcm.getToken();
 
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'fullName': fullName,
         'email': email,
         'dob': dob,
         'gender': gender,
-        'accountType': 'patient',
+        'accountType': accountType,
         'uid': userCredential.user!.uid,
-        'fcmToken': fcmToken, // Add FCM token to user document
-        'lastTokenUpdate': FieldValue.serverTimestamp(),
-        'createdAt': FieldValue.serverTimestamp(),
       });
 
       return true;
     } catch (e) {
-      print("Registration error: $e");
       return false;
     }
   }
-
-  // Future<Map<String, dynamic>?> loginUser(String email, String password) async {
-  //   try {
-  //     final UserCredential userCred = await _auth.signInWithEmailAndPassword(
-  //       email: email,
-  //       password: password,
-  //     );
-
-  //     // Update FCM token on login
-  //     await _updateFcmToken(userCred.user!.uid);
-
-  //     final uid = userCred.user!.uid;
-  //     final userDoc = await _firestore.collection('users').doc(uid).get();
-  //     return userDoc.data();
-  //   } catch (e) {
-  //     print("Login error: $e");
-  //     return null;
-  //   }
-  // }
 
   Future<Map<String, dynamic>?> loginUser(String email, String password) async {
     try {
@@ -286,10 +296,43 @@ class AuthService extends ChangeNotifier {
   //   await _auth.signOut();
   // }
 
+  // Future<void> signOut() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.remove('accountType');
+  //   await _auth.signOut();
+  // }
+
   Future<void> signOut() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('accountType');
-    await _auth.signOut();
+    try {
+      // Clear local data first
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('accountType');
+
+      await prefs.clear();
+
+      // Try to remove FCM token, but don't fail if it doesn't work
+      try {
+        if (_user != null) {
+          await _firestore.collection('users').doc(_user!.uid).update({
+            'fcmToken': FieldValue.delete(),
+            'lastTokenUpdate': FieldValue.serverTimestamp(),
+          });
+        }
+      } catch (e) {
+        debugPrint('Could not remove FCM token: $e');
+        // Continue with logout even if this fails
+      }
+
+      // Sign out from Firebase
+      await _auth.signOut();
+
+      // Reset local state
+      _user = null;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Sign out error: $e');
+      rethrow;
+    }
   }
 
   // Add this method to handle notification permission request

@@ -17,7 +17,7 @@ class _AiHealthBotScreenState extends State<AiHealthBotScreen> {
   bool _isLoading = false;
 
   final String _apiKey =
-      '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';
+      '1';
   final String _apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
   final String _model = 'llama3-70b-8192';
 
@@ -69,7 +69,7 @@ class _AiHealthBotScreenState extends State<AiHealthBotScreen> {
             {
               "role": "system",
               "content":
-                  "You are MediConnect AI, a friendly health assistant in a healthcare app. Provide clear, concise health information. Be professional yet approachable. Offer general advice only, emphasizing when to see a doctor. Keep responses under 150 words unless more detail is requested. Format responses with bullet points when appropriate."
+                  "You are MediConnect AI, a friendly health assistant in a healthcare app. Provide clear, concise health information. Be professional yet approachable. Offer general advice only, emphasizing when to see a doctor. Keep responses under 150 words unless more detail is requested.  Format responses with simple bullet points using '-' and clear section headers. Do not use markdown formatting like ** or other special characters."
             },
             ..._messages.map((msg) => {
                   "role": msg["role"],
@@ -81,7 +81,8 @@ class _AiHealthBotScreenState extends State<AiHealthBotScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final reply = data['choices'][0]['message']['content'];
+        final reply =
+            _formatResponseText(data['choices'][0]['message']['content']);
 
         setState(() {
           _messages.add({'role': 'assistant', 'content': reply});
@@ -107,8 +108,57 @@ class _AiHealthBotScreenState extends State<AiHealthBotScreen> {
     _scrollToBottom();
   }
 
+  List<TextSpan> _parseMessageText(String text) {
+    final List<TextSpan> spans = [];
+    final lines = text.split('\n');
+
+    for (final line in lines) {
+      if (line.trim().isEmpty) continue;
+
+      // Handle bullet points
+      if (line.trim().startsWith('- ') || line.trim().startsWith('• ')) {
+        spans.add(TextSpan(
+          text: '• ',
+          style: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.bold,
+          ),
+        ));
+        spans.add(TextSpan(
+          text: line.substring(2) + '\n',
+          style: TextStyle(
+            color: Colors.grey[800],
+            fontSize: 15,
+          ),
+        ));
+      }
+      // Handle headers (like "When to see a doctor:")
+      else if (line.endsWith(':')) {
+        spans.add(TextSpan(
+          text: line + '\n',
+          style: TextStyle(
+            color: Colors.grey[800],
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ));
+      } else {
+        spans.add(TextSpan(
+          text: line + '\n',
+          style: TextStyle(
+            color: Colors.grey[800],
+            fontSize: 15,
+          ),
+        ));
+      }
+    }
+
+    return spans;
+  }
+
   Future<void> _saveChatHistory() async {
-    final chatHistoryRef = FirebaseFirestore.instance.collection('ai_health_bot_chats');
+    final chatHistoryRef =
+        FirebaseFirestore.instance.collection('ai_health_bot_chats');
     final chatDocRef = chatHistoryRef.doc(); // Creates a new document
 
     // Store the chat messages as a list of maps
@@ -179,8 +229,10 @@ class _AiHealthBotScreenState extends State<AiHealthBotScreen> {
                       width: 1,
                     ),
                   ),
-                  child: Text(
-                    msg['content'] ?? '',
+                  child: SelectableText.rich(
+                    TextSpan(
+                      children: _parseMessageText(msg['content'] ?? ''),
+                    ),
                     style: TextStyle(
                       color: Colors.grey[800],
                       fontSize: 15,
@@ -246,27 +298,26 @@ class _AiHealthBotScreenState extends State<AiHealthBotScreen> {
   }
 
   Widget _buildSuggestedQuestionChip(String question) {
-  return GestureDetector(
-    onTap: () => _sendMessage(question),
-    child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.blue[100]!),
-      ),
-      child: Text(
-        question,
-        style: TextStyle(
-          color: Color(0xFF2B479A),
-          fontSize: 13,
+    return GestureDetector(
+      onTap: () => _sendMessage(question),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.blue[50],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.blue[100]!),
+        ),
+        child: Text(
+          question,
+          style: TextStyle(
+            color: Color(0xFF2B479A),
+            fontSize: 13,
+          ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   @override
   void dispose() {
@@ -464,6 +515,20 @@ class _AiHealthBotScreenState extends State<AiHealthBotScreen> {
         ],
       ),
     );
+  }
+
+  String _formatResponseText(String text) {
+    // Remove unwanted artifacts like 'axc'
+    text = text.replaceAll('axc', '');
+
+    // Convert markdown ** to bold (using RichText later)
+    // For now just remove the ** if we're not handling rich text
+    text = text.replaceAll('**', '');
+
+    // Ensure proper spacing
+    text = text.replaceAll('\n\n', '\n').trim();
+
+    return text;
   }
 }
 

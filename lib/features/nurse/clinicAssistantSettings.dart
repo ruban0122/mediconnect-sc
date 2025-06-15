@@ -1,27 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mediconnect/features/appointment/appointment_history_screen.dart';
-import 'package:mediconnect/features/appointment/appointment_list_prescription.dart';
-import 'package:mediconnect/features/appointment/doctorAppointmentsHistoryScreen.dart';
 import 'package:mediconnect/features/login/login_screen.dart';
 import 'package:mediconnect/features/registration/auth_service.dart';
-import 'package:mediconnect/features/settingsScreen/HealthRecordScreen.dart';
-import 'package:mediconnect/features/settingsScreen/MedicalInfoScreen.dart';
 import 'package:mediconnect/features/settingsScreen/account_settings_page.dart';
-import 'package:mediconnect/features/settingsScreen/health_record_screen.dart';
-import 'package:mediconnect/features/videoCalling/patient_prescription_screen.dart';
+import 'package:mediconnect/features/settingsScreen/doctorEditProfileScreen.dart';
+import 'package:mediconnect/features/settingsScreen/edit_profile_screen.dart';
 import 'package:provider/provider.dart';
-import 'edit_profile_screen.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+class ClinicAssistantProfilePage extends StatefulWidget {
+  const ClinicAssistantProfilePage({super.key});
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ClinicAssistantProfilePage> createState() =>
+      _ClinicAssistantProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ClinicAssistantProfilePageState
+    extends State<ClinicAssistantProfilePage> {
   String fullName = '';
   String location = '';
   String email = '';
@@ -74,9 +70,11 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      //backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F7FA),
+        // backgroundColor: const Color(0xFFF5F7FA),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 0,
         centerTitle: true,
         title: const Text(
@@ -191,7 +189,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  fullName,
+                  '$fullName',
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -201,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             // User Information Section
             _sectionTitle("User Information"),
@@ -212,20 +210,24 @@ class _ProfilePageState extends State<ProfilePage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                  MaterialPageRoute(
+                      builder: (_) => const DoctorEditProfileScreen()),
                 );
               },
             ),
-            _profileOption(
-              title: "Medical Information",
-              icon: Icons.health_and_safety_outlined,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MedicalInfoScreen()),
-                );
-              },
-            ),
+            // _profileOption(
+            //   title: "My Schedule",
+            //   icon: Icons.calendar_month,
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //           builder: (_) => DoctorAvailabilityScreen(
+            //                 doctorId: FirebaseAuth.instance.currentUser!.uid,
+            //               )),
+            //     );
+            //   },
+            // ),
             // _profileOption(
             //   title: "Appointment History",
             //   icon: Icons.history,
@@ -233,22 +235,10 @@ class _ProfilePageState extends State<ProfilePage> {
             //     Navigator.push(
             //       context,
             //       MaterialPageRoute(
-            //           builder: (_) => const AppointmentHistoryScreen()),
+            //           builder: (_) => const DoctorAppointmentsHistoryScreen()),
             //     );
             //   },
             // ),
-            _profileOption(
-              title: "Prescription",
-              icon: Icons.history,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (_) =>
-                          const AppointmentListPrescriptionScreen()),
-                );
-              },
-            ),
 
             const SizedBox(height: 10),
 
@@ -277,6 +267,29 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Widget _profileOption({
+  //   required String title,
+  //   required IconData icon,
+  //   required VoidCallback onTap,
+  // }) {
+  //   return Container(
+  //     margin: const EdgeInsets.only(bottom: 12),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: ListTile(
+  //       onTap: onTap,
+  //       leading: Icon(icon, color: const Color(0xFF2B479A), size: 28),
+  //       title: Text(
+  //         title,
+  //         style: const TextStyle(fontWeight: FontWeight.w600),
+  //       ),
+  //       trailing:
+  //           const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+  //     ),
+  //   );
+  // }
   Widget _profileOption({
     required String title,
     required IconData icon,

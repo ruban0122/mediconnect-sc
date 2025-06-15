@@ -1919,6 +1919,7 @@ import 'package:flutter/material.dart';
 import 'package:mediconnect/features/appointment/booking_success_screen.dart';
 import 'package:mediconnect/features/videoCalling/appointment_session_complete_screen.dart';
 import 'package:mediconnect/features/videoCalling/appointment_session_complete_screen_doctor.dart';
+import 'package:mediconnect/features/videoCalling/prescription_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -2838,18 +2839,18 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ),
       );
 
-      if (confirm == true) {
-        try {
-          await FirebaseFirestore.instance
-              .collection('appointments')
-              .doc(widget.appointmentId)
-              .update({'status': 'completed'});
-        } catch (e) {
-          debugPrint('Error updating appointment status: $e');
-        }
-      } else {
-        return; // Doctor cancelled
-      }
+      // if (confirm == true) {
+      //   try {
+      //     await FirebaseFirestore.instance
+      //         .collection('appointments')
+      //         .doc(widget.appointmentId)
+      //         .update({'status': 'completed'});
+      //   } catch (e) {
+      //     debugPrint('Error updating appointment status: $e');
+      //   }
+      // } else {
+      //   return; // Doctor cancelled
+      // }
     }
 
     await _engine?.leaveChannel();
@@ -2859,7 +2860,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => isDoctor
-              ? const AppointmentCompleteScreenDoctor()
+              ? PrescriptionScreen(
+                  appointmentId: widget.appointmentId,
+                  callDuration: _callDuration,
+                )
               : const AppointmentCompleteScreen(),
         ),
       );

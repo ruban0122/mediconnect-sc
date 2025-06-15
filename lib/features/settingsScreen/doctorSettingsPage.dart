@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mediconnect/features/appointment/doctorAppointmentsHistoryScreen.dart';
 import 'package:mediconnect/features/appointment/doctor_availability_screen.dart';
+import 'package:mediconnect/features/login/login_screen.dart';
 import 'package:mediconnect/features/registration/auth_service.dart';
 import 'package:mediconnect/features/settingsScreen/account_settings_page.dart';
 import 'package:mediconnect/features/settingsScreen/doctorEditProfileScreen.dart';
@@ -92,9 +93,61 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
           IconButton(
             icon: const Icon(Icons.exit_to_app, color: Colors.black),
             onPressed: () async {
-              final authService =
-                  Provider.of<AuthService>(context, listen: false);
-              await authService.signOut();
+              final shouldLogout = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Log Out',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  content: const Text('Are you sure you want to log out?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel',
+                          style: TextStyle(color: Colors.black)),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Log Out',
+                          style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              );
+
+              if (shouldLogout ?? false) {
+                // Store context in a variable that won't be affected by route changes
+                final currentContext = context;
+
+                // Show loading indicator
+                showDialog(
+                  context: currentContext,
+                  barrierDismissible: false,
+                  builder: (context) =>
+                      const Center(child: CircularProgressIndicator()),
+                );
+
+                try {
+                  final authService =
+                      Provider.of<AuthService>(currentContext, listen: false);
+                  await authService.signOut();
+
+                  // Use the stored context for navigation
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                } catch (e) {
+                  // Only pop if the context is still mounted
+                  if (currentContext.mounted) {
+                    Navigator.of(currentContext).pop(); // Close loading dialog
+                    ScaffoldMessenger.of(currentContext).showSnackBar(
+                      SnackBar(content: Text('Logout failed: ${e.toString()}')),
+                    );
+                  }
+                }
+              }
             },
           ),
         ],

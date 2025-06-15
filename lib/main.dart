@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:mediconnect/features/DoctorHomePage.dart';
 import 'package:mediconnect/features/main_app_screen.dart';
+import 'package:mediconnect/features/nurse/nurseHome.dart';
+import 'package:mediconnect/features/nurse/nurse_home_screen.dart';
 import 'package:mediconnect/features/registration/auth_service.dart';
 import 'package:mediconnect/notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -109,9 +111,58 @@ class MyApp extends StatelessWidget {
 //   }
 // }
 
-class AuthWrapper extends StatelessWidget {
-  final String? savedRole;
+// class AuthWrapper extends StatelessWidget {
+//   final String? savedRole;
+//   const AuthWrapper({super.key, required this.savedRole});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final authService = Provider.of<AuthService>(context);
+
+//     print('savedRole: $savedRole');
+
+//     if (authService.user == null) {
+//       return const OnboardingScreen();
+//     } else {
+//       if (savedRole == 'doctor') {
+//         return const DocHomePage();
+//       } else if (savedRole == 'nurse') {
+//         return const ClinicAssistantHomePage();
+//       } else {
+//         return const HomePageScreen();
+//       }
+//     }
+//   }
+// }
+
+class AuthWrapper extends StatefulWidget {
+
+  final String? savedRole; // <-- Add this line
   const AuthWrapper({super.key, required this.savedRole});
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  String? savedRole;
+
+@override
+void initState() {
+  super.initState();
+  savedRole = widget.savedRole;
+  if (savedRole == null) {
+    _loadRole();
+  }
+}
+
+
+  Future<void> _loadRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      savedRole = prefs.getString('accountType');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,12 +170,19 @@ class AuthWrapper extends StatelessWidget {
 
     if (authService.user == null) {
       return const OnboardingScreen();
+    }
+
+    if (savedRole == null) {
+      // Optional: show loading spinner while fetching role
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (savedRole == 'doctor') {
+      return const DocHomePage();
+    } else if (savedRole == 'nurse') {
+      return const ClinicAssistantHomePage();
     } else {
-      if (savedRole == 'doctor') {
-        return const DocHomePage();
-      } else {
-        return const HomePageScreen();
-      }
+      return const HomePageScreen();
     }
   }
 }

@@ -1,20 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mediconnect/features/appointment/appointment_page.dart';
+import 'package:mediconnect/features/appointment/doctorAppointmentPage.dart';
+import 'package:mediconnect/features/doctor_home_page.dart';
 import 'package:mediconnect/features/login/home_page.dart';
-import 'aiHealthChatBotScreen.dart';
-import 'settingsScreen/settings_page.dart';
+import 'package:mediconnect/features/nurse/clinicAssistantSettings.dart';
+import 'package:mediconnect/features/nurse/nurse_home_screen.dart';
+import 'package:mediconnect/features/nurse/qr_scanner_screen.dart';
+import 'package:mediconnect/features/settingsScreen/doctorSettingsPage.dart';
 
-class HomePageScreen extends StatefulWidget {
-  const HomePageScreen({super.key, this.initialTab = 0});
+class ClinicAssistantHomePage extends StatefulWidget {
+  const ClinicAssistantHomePage({super.key, this.initialTab = 0});
   final int initialTab;
 
   @override
-  State<HomePageScreen> createState() => _HomePageScreenState();
+  State<ClinicAssistantHomePage> createState() =>
+      _ClinicAssistantHomePageState();
 }
 
-class _HomePageScreenState extends State<HomePageScreen> {
+class _ClinicAssistantHomePageState extends State<ClinicAssistantHomePage> {
   int _currentIndex = 0;
   String fullName = '';
   String email = '';
@@ -30,13 +34,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
     super.initState();
     _currentIndex = widget.initialTab;
     _pages = [
-      HomePage(
+      ClinicAssistantHomeScreen(
           fullName: fullName,
           upcomingCount: _upcomingCount,
           profileImageUrl: profileImageUrl),
-      const AppointmentPage(),
-      const AiHealthBotScreen(),
-      const ProfilePage(),
+      const QrScannerScreen(),
+      const ClinicAssistantProfilePage(),
     ];
     fetchUpcomingAppointments();
     _fetchUserData();
@@ -53,7 +56,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
     final querySnapshot = await FirebaseFirestore.instance
         .collection('appointments')
-        .where('patientId', isEqualTo: user.uid)
+        .where('doctorId', isEqualTo: user.uid)
         .where('status', isEqualTo: 'confirmed')
         .where('dateTime', isGreaterThan: Timestamp.fromDate(now))
         .get();
@@ -63,7 +66,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     setState(() {
       _upcomingCount = querySnapshot.docs.length;
       // Update the HomePage in the pages list with the new count
-      _pages[0] = HomePage(
+      _pages[0] = ClinicAssistantHomeScreen(
           fullName: fullName,
           upcomingCount: _upcomingCount,
           profileImageUrl: profileImageUrl);
@@ -80,9 +83,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
   //         fullName = doc['fullName'] ?? '';
   //         email = doc['email'] ?? '';
   //         profileImageUrl = doc['profileImageUrl'] ?? '';
+
   //         isLoading = false;
   //         // Update the HomePage with the new name and count
-  //         _pages[0] = HomePage(
+  //         _pages[0] = ClinicAssistantHomeScreen(
   //             fullName: fullName,
   //             upcomingCount: _upcomingCount,
   //             profileImageUrl: profileImageUrl);
@@ -94,47 +98,34 @@ class _HomePageScreenState extends State<HomePageScreen> {
   // }
 
   Future<void> _fetchUserData() async {
-    try {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid != null) {
-        final doc =
-            await FirebaseFirestore.instance.collection('users').doc(uid).get();
-        final data = doc.data();
+  try {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      final data = doc.data();
 
-        if (data != null) {
-          setState(() {
-            fullName = data['fullName'] ?? '';
-            email = data['email'] ?? '';
-            profileImageUrl = data.containsKey('profileImageUrl')
-                ? data['profileImageUrl']
-                : '';
+      if (data != null) {
+        setState(() {
+          fullName = data['fullName'] ?? '';
+          email = data['email'] ?? '';
+          profileImageUrl = data.containsKey('profileImageUrl') ? data['profileImageUrl'] : '';
 
-            isLoading = false;
+          isLoading = false;
 
-            // Update the HomePage with the new name and count
-            _pages[0] = HomePage(
-              fullName: fullName,
-              upcomingCount: _upcomingCount,
-              profileImageUrl: profileImageUrl,
-            );
-          });
-        }
+          // Update the HomePage with the new name and count
+          _pages[0] = ClinicAssistantHomeScreen(
+            fullName: fullName,
+            upcomingCount: _upcomingCount,
+            profileImageUrl: profileImageUrl,
+          );
+        });
       }
-    } catch (e) {
-      print('Error fetching user data: $e');
     }
+  } catch (e) {
+    print('Error fetching user data: $e');
   }
+}
 
-  void _navigateToBookingFlow(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Scaffold(
-          body: AppointmentPage(), // Your first booking screen
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -154,10 +145,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          // BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today), label: 'Appointment'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.smart_toy), label: 'AI Chatbot'),
+              icon: Icon(Icons.scanner), label: 'QR Scanner'),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.smart_toy_outlined), label: 'AI Chatbot'),
           BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: 'Settings'),
         ],

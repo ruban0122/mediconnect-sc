@@ -610,7 +610,9 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             const SizedBox(width: 12),
             Text(
-              widget.otherUserName,
+              widget.userRole == 'patient'
+                  ? 'Dr. ${widget.otherUserName}'
+                  : widget.otherUserName,
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.white,

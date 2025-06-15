@@ -160,24 +160,56 @@ class _DocHomePageState extends State<DocHomePage> {
     });
   }
 
+  // Future<void> _fetchUserData() async {
+  //   try {
+  //     final uid = FirebaseAuth.instance.currentUser?.uid;
+  //     if (uid != null) {
+  //       final doc =
+  //           await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  //       setState(() {
+  //         fullName = doc['fullName'] ?? '';
+  //         email = doc['email'] ?? '';
+  //         profileImageUrl = doc['profileImageUrl'] ?? '';
+
+  //         isLoading = false;
+  //         // Update the HomePage with the new name and count
+  //         _pages[0] = DoctorHomePage(
+  //             fullName: fullName,
+  //             upcomingCount: _upcomingCount,
+  //             profileImageUrl: profileImageUrl);
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching user data: $e');
+  //   }
+  // }
+
   Future<void> _fetchUserData() async {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid != null) {
         final doc =
             await FirebaseFirestore.instance.collection('users').doc(uid).get();
-        setState(() {
-          fullName = doc['fullName'] ?? '';
-          email = doc['email'] ?? '';
-          profileImageUrl = doc['profileImageUrl'] ?? '';
+        final data = doc.data();
 
-          isLoading = false;
-          // Update the HomePage with the new name and count
-          _pages[0] = DoctorHomePage(
+        if (data != null) {
+          setState(() {
+            fullName = data['fullName'] ?? '';
+            email = data['email'] ?? '';
+            profileImageUrl = data.containsKey('profileImageUrl')
+                ? data['profileImageUrl']
+                : '';
+
+            isLoading = false;
+
+            // Update the HomePage with the new name and count
+            _pages[0] = DoctorHomePage(
               fullName: fullName,
               upcomingCount: _upcomingCount,
-              profileImageUrl: profileImageUrl);
-        });
+              profileImageUrl: profileImageUrl,
+            );
+          });
+        }
       }
     } catch (e) {
       print('Error fetching user data: $e');

@@ -223,7 +223,71 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   }
 
   // 🎨 Doctor Card
+  // Widget _buildDoctorCard(BuildContext context, DocumentSnapshot doctor) {
+  //   return GestureDetector(
+  //     onTap: () => _navigateToBooking(context, doctor),
+  //     child: Container(
+  //       margin: const EdgeInsets.only(bottom: 12),
+  //       padding: const EdgeInsets.all(16),
+  //       decoration: BoxDecoration(
+  //         color: Colors.white,
+  //         borderRadius: BorderRadius.circular(15),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.blue.withOpacity(0.2),
+  //             blurRadius: 10,
+  //             spreadRadius: 2,
+  //             offset: const Offset(0, 4),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Row(
+  //         children: [
+  //           // 🏥 Doctor Profile Image
+  //           CircleAvatar(
+  //             radius: 35,
+  //             backgroundImage: doctor['profileImageUrl'] != null
+  //                 ? NetworkImage(doctor['profileImageUrl'])
+  //                 : const AssetImage('assets/doctor_placeholder.png')
+  //                     as ImageProvider,
+  //           ),
+  //           const SizedBox(width: 15),
+
+  //           // 📋 Doctor Info
+  //           Expanded(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   "Dr ${doctor['fullName']}",
+  //                   style: const TextStyle(
+  //                       fontSize: 18, fontWeight: FontWeight.bold),
+  //                 ),
+  //                 const SizedBox(height: 4),
+  //                 Text(
+  //                   "${doctor['specialization'] ?? "General"}",
+  //                   style: const TextStyle(
+  //                       fontSize: 14, fontWeight: FontWeight.normal),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+
+  //           // ➡️ Arrow Icon
+  //           const Icon(Icons.arrow_forward_ios,
+  //               color: Colors.blueAccent, size: 18),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _buildDoctorCard(BuildContext context, DocumentSnapshot doctor) {
+    final data = doctor.data() as Map<String, dynamic>;
+
+    final hasProfileImage = data.containsKey('profileImageUrl') &&
+        (data['profileImageUrl'] ?? '').toString().isNotEmpty;
+
     return GestureDetector(
       onTap: () => _navigateToBooking(context, doctor),
       child: Container(
@@ -243,37 +307,32 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
         ),
         child: Row(
           children: [
-            // 🏥 Doctor Profile Image
             CircleAvatar(
               radius: 35,
-              backgroundImage: doctor['profileImageUrl'] != null
-                  ? NetworkImage(doctor['profileImageUrl'])
+              backgroundImage: hasProfileImage
+                  ? NetworkImage(data['profileImageUrl'])
                   : const AssetImage('assets/doctor_placeholder.png')
                       as ImageProvider,
             ),
             const SizedBox(width: 15),
-
-            // 📋 Doctor Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Dr ${doctor['fullName']}",
+                    "Dr ${data['fullName'] ?? "Unknown"}",
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "${doctor['specialization'] ?? "General"}",
+                    "${data['specialization'] ?? "General"}",
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.normal),
                   ),
                 ],
               ),
             ),
-
-            // ➡️ Arrow Icon
             const Icon(Icons.arrow_forward_ios,
                 color: Colors.blueAccent, size: 18),
           ],
@@ -283,14 +342,47 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   }
 
   // 🚀 Animated Navigation
-  void _navigateToBooking(BuildContext context, DocumentSnapshot doctor) {
-    // 🏥 Extract doctor details safely
-    String doctorName = doctor['fullName'] ?? "Unknown Doctor";
-    String specialization = doctor['specialization'] ?? "General";
-    String location = doctor['address'] ?? "Not specified";
-    String profileImage = doctor['profileImageUrl'] ?? "";
+  // void _navigateToBooking(BuildContext context, DocumentSnapshot doctor) {
+  //   // 🏥 Extract doctor details safely
+  //   String doctorName = doctor['fullName'] ?? "Unknown Doctor";
+  //   String specialization = doctor['specialization'] ?? "General";
+  //   String location = doctor['address'] ?? "Not specified";
+  //   String profileImage = doctor['profileImageUrl'] ?? "";
 
-    // 🚀 Navigate with all required arguments
+  //   // 🚀 Navigate with all required arguments
+  //   Navigator.push(
+  //     context,
+  //     PageRouteBuilder(
+  //       transitionDuration: const Duration(milliseconds: 400),
+  //       pageBuilder: (_, __, ___) => SelectDateTimeScreen(
+  //         doctorId: doctor.id,
+  //         doctorName: doctorName,
+  //         specialization: specialization,
+  //         location: location,
+  //         profileImage: profileImage,
+  //       ),
+  //       transitionsBuilder: (_, animation, __, child) {
+  //         return SlideTransition(
+  //           position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+  //               .animate(animation),
+  //           child: child,
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+  void _navigateToBooking(BuildContext context, DocumentSnapshot doctor) {
+    final data = doctor.data() as Map<String, dynamic>;
+
+    // Safely extract with fallback values
+    String doctorName = data['fullName'] ?? "Unknown Doctor";
+    String specialization =
+        data.containsKey('specialization') ? data['specialization'] : "General";
+    String location =
+        data.containsKey('address') ? data['address'] : "Not specified";
+    String profileImage =
+        data.containsKey('profileImageUrl') ? data['profileImageUrl'] : "";
+
     Navigator.push(
       context,
       PageRouteBuilder(
