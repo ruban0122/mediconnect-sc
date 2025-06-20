@@ -17,7 +17,7 @@ pipeline {
 
         stage('Install Flutter SDK') {
             steps {
-                sh '''
+                bat '''
                     echo "👉 Cloning Flutter SDK..."
                     git clone https://github.com/flutter/flutter.git -b stable
                     export PATH="$PATH:${WORKSPACE}/flutter/bin"
@@ -28,25 +28,25 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'flutter pub get'
+                bat 'flutter pub get'
             }
         }
 
         stage('Analyze Code') {
             steps {
-                sh 'flutter analyze'
+                bat 'flutter analyze'
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                sh 'flutter test'
+                bat 'flutter test'
             }
         }
 
         stage('Build APK') {
             steps {
-                sh 'flutter build apk --debug'
+                bat 'flutter build apk --debug'
             }
         }
 
