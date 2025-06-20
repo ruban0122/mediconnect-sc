@@ -37,10 +37,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
+                    echo "Current directory contents:"
+                    ls -la
                     docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
                 '''
             }
         }
+
 
         stage('Login to Docker Hub') {
             steps {
