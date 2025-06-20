@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git url: 'https://github.com/ruban0122/mediconnect.git', branch: 'MediConnect-Sprint-4'
+                git url: 'https://github.com/ruban0122/mediconnect.git', branch: 'Mediconnect-Sprint-4'
             }
         }
 
