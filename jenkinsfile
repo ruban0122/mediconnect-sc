@@ -1,102 +1,22 @@
+
 pipeline {
     agent any
-
-    environment {
-        FLUTTER_VERSION = '3.19.0'
-        APK_OUTPUT = 'build/app/outputs/flutter-apk/app-debug.apk'
-        FLUTTER_HOME = "${env.WORKSPACE}/flutter"
-        PATH = "${env.FLUTTER_HOME}/bin:${env.PATH}"
-    }
-
     stages {
-        stage('Checkout Code') {
+        stage('Build') {
             steps {
-                git credentialsId: 'github-token', url: 'https://github.com/ruban0122/mediconnect-sc.git'
+                echo 'Building...'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
             }
         }
 
-        stage('Install Flutter') {
+        stage('Deploy') {
             steps {
-                sh '''
-                    git clone https://github.com/flutter/flutter.git -b stable
-                    export PATH="$PATH:${WORKSPACE}/flutter/bin"
-                    flutter --version
-                '''
+                echo 'Deploying...'
             }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                    export PATH="$PATH:${WORKSPACE}/flutter/bin"
-                    flutter pub get
-                '''
-            }
-        }
-
-        stage('Analyze Code') {
-            steps {
-                sh '''
-                    export PATH="$PATH:${WORKSPACE}/flutter/bin"
-                    flutter analyze
-                '''
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh '''
-                    export PATH="$PATH:${WORKSPACE}/flutter/bin"
-                    flutter test
-                '''
-            }
-        }
-
-        stage('Build APK') {
-            steps {
-                sh '''
-                    export PATH="$PATH:${WORKSPACE}/flutter/bin"
-                    flutter build apk --debug
-                '''
-            }
-        }
-
-        stage('Archive APK') {
-            steps {
-                archiveArtifacts artifacts: "${APK_OUTPUT}", fingerprint: true
-            }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Flutter build pipeline completed successfully!'
-        }
-        failure {
-            echo '❌ Flutter build pipeline failed.'
         }
     }
 }
-
-
-// pipeline {
-//     agent any
-//     stages {
-//         stage('Build') {
-//             steps {
-//                 echo 'Building...'
-//             }
-//         }
-//         stage('Test') {
-//             steps {
-//                 echo 'Testing...'
-//             }
-//         }
-
-//         stage('Deploy') {
-//             steps {
-//                 echo 'Deploying...'
-//             }
-//         }
-//     }
-// }
