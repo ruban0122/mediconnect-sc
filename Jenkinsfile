@@ -64,19 +64,19 @@ pipeline {
             steps {
                 script {
                     def issueKey = 'KAN-6'
-                    jiraComment (
-                        issueKey: issueKey,
-                        comment: "✅ Jenkins build ${env.BUILD_NUMBER} completed successfully. Docker image pushed.",
-                        site: 'MyJira'
+                    
+                    // Add a comment to the issue
+                    jiraAddComment (
+                        idOrKey: issueKey,
+                        comment: "✅ Jenkins build #${env.BUILD_NUMBER} successful. Docker image pushed.",
+                        site: 'MyJiraSite'
                     )
-                    jiraTransitionIssue (
-                        issueKey: issueKey,
-                        transition: 'Done',
-                        site: 'MyJira'
-                    )
+        
+                    // Optionally, you can use REST or curl to transition status (manual setup)
                 }
             }
         }
+
     }
 
     post {
