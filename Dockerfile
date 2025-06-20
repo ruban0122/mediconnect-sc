@@ -1,5 +1,5 @@
 # Use a Flutter image with Dart 3.5.4+ (Flutter 3.22+)
-FROM ghcr.io/cirruslabs/flutter:main
+FROM ghcr.io/cirruslabs/flutter:3.22
 
 # Set working directory
 WORKDIR /app
