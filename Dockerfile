@@ -1,10 +1,10 @@
-# Use Flutter official image
-FROM cirrusci/flutter:stable
+# Use a Flutter image with Dart 3.5.4+ (Flutter 3.22+)
+FROM ghcr.io/cirruslabs/flutter:main
 
 # Set working directory
 WORKDIR /app
 
-# Copy everything into the container
+# Copy all project files
 COPY . .
 
 # Install dependencies
@@ -13,5 +13,4 @@ RUN flutter pub get
 # Build APK
 RUN flutter build apk --release
 
-# Optional: this is not for running, just for build output
 CMD ["echo", "Flutter build completed."]
