@@ -44,7 +44,6 @@ pipeline {
             }
         }
 
-
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
@@ -60,25 +59,25 @@ pipeline {
                 '''
             }
         }
-    
 
         stage('Update Jira Issue') {
-                steps {
-                    script {
-                        def issueKey = 'KAN-6'
-                        jiraComment (
-                            issueKey: issueKey,
-                            comment: "✅ Jenkins build ${env.BUILD_NUMBER} completed successfully. Docker image pushed.",
-                            site: 'MyJira'
-                        )
-                        jiraTransitionIssue (
-                            issueKey: issueKey,
-                            transition: 'Done',
-                            site: 'MyJira'
-                        )
-                    }
+            steps {
+                script {
+                    def issueKey = 'KAN-6'
+                    jiraComment (
+                        issueKey: issueKey,
+                        comment: "✅ Jenkins build ${env.BUILD_NUMBER} completed successfully. Docker image pushed.",
+                        site: 'MyJira'
+                    )
+                    jiraTransitionIssue (
+                        issueKey: issueKey,
+                        transition: 'Done',
+                        site: 'MyJira'
+                    )
                 }
             }
+        }
+    }
 
     post {
         success {
@@ -88,5 +87,4 @@ pipeline {
             echo '❌ Build failed!'
         }
     }
-}
 }
