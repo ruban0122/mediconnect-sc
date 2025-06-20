@@ -1,16 +1,16 @@
-# Use a Flutter image with Dart 3.5.4+ (Flutter 3.22+)
-FROM cirrusci/flutter:latest
+FROM dart:stable AS build-env
 
-# Set working directory
+# Install Flutter SDK (manually)
+RUN apt-get update && apt-get install -y curl git unzip xz-utils zip libglu1-mesa && \
+    git clone https://github.com/flutter/flutter.git -b stable /flutter && \
+    /flutter/bin/flutter doctor
+
+ENV PATH="/flutter/bin:/flutter/bin/cache/dart-sdk/bin:${PATH}"
+
 WORKDIR /app
 
-# Copy all project files
 COPY . .
 
-# Install dependencies
 RUN flutter pub get
 
-# Build APK
 RUN flutter build apk --release
-
-CMD ["echo", "Flutter build completed."]
