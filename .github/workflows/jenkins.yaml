@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build Flutter App
+    name: Build & Test Flutter App
     runs-on: ubuntu-latest
 
     steps:
@@ -29,5 +29,11 @@ jobs:
       - name: Run Tests
         run: flutter test
 
-      - name: Build APK
+      - name: Build APK (Debug)
         run: flutter build apk --debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: mediconnect-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
