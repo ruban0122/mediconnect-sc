@@ -9,3 +9,4 @@ COPY ci_output/app-release.apk .
 
 # Optionally expose the APK path or define CMD if running container
 CMD ["echo", "APK copied into image. Use docker cp to extract."]
+
