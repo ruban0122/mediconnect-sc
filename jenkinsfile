@@ -70,7 +70,20 @@ pipeline {
 
         stage('Archive APK') {
             steps {
-                archiveArtifacts artifacts: 'build\\app\\outputs\\flutter-apk\\app-release.apk'
+                archiveArtifacts artifacts: 'build\\app\\outputs\\flutter-apk\\app-release.apk', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Flutter build pipeline completed successfully!"
+        }
+        failure {
+            echo "❌ Flutter build failed."
+        }
+    }
+}
 
 
 
