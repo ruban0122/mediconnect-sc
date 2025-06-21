@@ -2,10 +2,12 @@ pipeline {
     agent any
 
     environment {
-        APK_OUTPUT = 'build\\app\\outputs\\flutter-apk\\app-debug.apk'
+        FLUTTER_HOME = "${env.WORKSPACE}\\flutter"
+        PATH = "${env.FLUTTER_HOME}\\bin;${env.PATH}"
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 git credentialsId: 'github-cred', url: 'https://github.com/ruban0122/mediconnect-sc.git', branch: 'main'
@@ -15,13 +17,17 @@ pipeline {
         stage('Install Flutter SDK') {
             steps {
                 bat '''
-                    echo 👉 Cloning Flutter SDK if not already exists...
+                    echo 👉 Checking for existing Flutter SDK...
                     if not exist "flutter" (
+                        echo 👉 Cloning Flutter SDK...
                         git clone https://github.com/flutter/flutter.git -b stable
+                    ) else (
+                        echo ✅ Flutter SDK already exists, skipping clone.
                     )
-                    echo 👉 Setting Flutter to PATH
+
+                    echo 👉 Adding Flutter to PATH and running flutter doctor...
                     set PATH=%CD%\\flutter\\bin;%PATH%
-                    flutter --version
+                    flutter doctor
                 '''
             }
         }
@@ -57,27 +63,15 @@ pipeline {
             steps {
                 bat '''
                     set PATH=%CD%\\flutter\\bin;%PATH%
-                    flutter build apk --debug
+                    flutter build apk --release
                 '''
             }
         }
 
         stage('Archive APK') {
             steps {
-                archiveArtifacts artifacts: "${APK_OUTPUT}", fingerprint: true
-            }
-        }
-    }
+                archiveArtifacts artifacts: 'build\\app\\outputs\\flutter-apk\\app-release.apk'
 
-    post {
-        success {
-            echo '✅ Flutter build completed successfully!'
-        }
-        failure {
-            echo '❌ Flutter build failed.'
-        }
-    }
-}
 
 
 // pipeline {
