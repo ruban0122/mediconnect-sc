@@ -27,7 +27,7 @@ pipeline {
 
               stage('Prepare APK') {
             steps {
-                sh '''
+                bat '''
                     mkdir ci_output
                     copy build/app/outputs/flutter-apk/app-release.apk ci_output/
                 '''
