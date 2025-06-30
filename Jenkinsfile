@@ -17,7 +17,7 @@ pipeline {
 
         stage('Build APK') {
             steps {
-                sh '''
+                bat '''
                     echo "Building Flutter APK..."
                     flutter pub get
                     flutter build apk --release
@@ -27,7 +27,7 @@ pipeline {
 
         stage('Prepare APK') {
             steps {
-                sh '''
+                bat '''
                     mkdir -p ci_output
                     cp build/app/outputs/flutter-apk/app-release.apk ci_output/
                 '''
@@ -36,7 +36,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
+                bat '''
                     echo "Current directory contents:"
                     ls -la
                     docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
@@ -47,14 +47,14 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    bat 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                sh '''
+                bat '''
                     docker push $DOCKER_IMAGE:$DOCKER_TAG
                 '''
             }
