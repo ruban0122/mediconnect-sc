@@ -15,48 +15,30 @@ pipeline {
             }
         }
 
-    stage('Build APK') {
-        steps {
-            bat '''
-                echo "📦 Building Flutter APK..."
-                flutter --version
-                flutter pub get
-                flutter build apk --release || exit /b 1
-                echo "🔍 APK build complete. Verifying output..."
-                dir build\\app\\outputs\\ /s
-            '''
+        stage('Build APK') {
+            steps {
+                sh '''
+                    echo "Building Flutter APK..."
+                    flutter pub get
+                    flutter build apk --release
+                '''
+            }
         }
-    }
-    
-    stage('Prepare APK') {
-        steps {
-            bat '''
-                echo "📁 Preparing APK..."
-    
-                if exist build\\app\\outputs\\flutter-apk\\app-release.apk (
-                    echo "✅ Found APK at flutter-apk path"
-                    mkdir ci_output 2>nul
-                    copy /Y build\\app\\outputs\\flutter-apk\\app-release.apk ci_output\\
-                ) else if exist build\\app\\outputs\\apk\\release\\app-release.apk (
-                    echo "✅ Found APK at alternate apk/release path"
-                    mkdir ci_output 2>nul
-                    copy /Y build\\app\\outputs\\apk\\release\\app-release.apk ci_output\\
-                ) else (
-                    echo "❌ APK not found in expected locations!"
-                    dir build\\app\\outputs
-                    exit /b 1
-                )
-            '''
+
+        stage('Prepare APK') {
+            steps {
+                sh '''
+                    mkdir -p ci_output
+                    cp build/app/outputs/flutter-apk/app-release.apk ci_output/
+                '''
+            }
         }
-    }
-
-
 
         stage('Build Docker Image') {
             steps {
-                bat '''
+                sh '''
                     echo "Current directory contents:"
-                    dir
+                    ls -la
                     docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
                 '''
             }
@@ -65,14 +47,14 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    bat 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                bat '''
+                sh '''
                     docker push $DOCKER_IMAGE:$DOCKER_TAG
                 '''
             }
