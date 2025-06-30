@@ -21,9 +21,11 @@ pipeline {
                     echo "Building Flutter APK..."
                     flutter pub get
                     flutter build apk --release
+                    dir build\\app\\outputs\\ /s
                 '''
             }
         }
+
 
 
         stage('Prepare APK') {
