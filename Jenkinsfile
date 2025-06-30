@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'ruban2201/mediconnect'
-        DOCKER_TAG = 'latest'
+        DOCKER_TAG = "${env.BUILD_NUMBER}"  // Using build number for unique tagging
         JAVA_HOME = tool name: 'JDK17', type: 'jdk'
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
@@ -11,7 +11,9 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git url: 'https://github.com/ruban0122/mediconnect-sc.git', branch: 'Mediconnect-Sprint-4'
+                git url: 'https://github.com/ruban0122/mediconnect-sc.git', 
+                     branch: 'Mediconnect-Sprint-4',
+                    
             }
         }
 
@@ -28,8 +30,8 @@ pipeline {
         stage('Prepare APK') {
             steps {
                 bat '''
-                    mkdir -p ci_output
-                    cp build/app/outputs/flutter-apk/app-release.apk ci_output/
+                    mkdir ci_output || echo "Directory already exists"
+                    xcopy /Y "build\\app\\outputs\\flutter-apk\\app-release.apk" "ci_output\\"
                 '''
             }
         }
@@ -38,16 +40,22 @@ pipeline {
             steps {
                 bat '''
                     echo "Current directory contents:"
-                    ls -la
-                    docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
+                    dir
+                    docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .
                 '''
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    bat 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    bat '''
+                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                    '''
                 }
             }
         }
@@ -55,7 +63,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 bat '''
-                    docker push $DOCKER_IMAGE:$DOCKER_TAG
+                    docker push %DOCKER_IMAGE%:%DOCKER_TAG%
                 '''
             }
         }
@@ -64,27 +72,28 @@ pipeline {
             steps {
                 script {
                     def issueKey = 'KAN-7'
-                    
-                    // Add a comment to the issue
-                    jiraAddComment (
+                    jiraAddComment(
                         idOrKey: issueKey,
-                        comment: "✅ Jenkins build #${env.BUILD_NUMBER} successful. Docker image pushed.",
+                        comment: "✅ Jenkins build #${env.BUILD_NUMBER} successful. Image: %DOCKER_IMAGE%:%DOCKER_TAG%",
                         site: 'MyJiraSite'
                     )
-        
-                    // Optionally, you can use REST or curl to transition status (manual setup)
                 }
             }
         }
-
     }
 
     post {
         success {
             echo '✅ Build and Docker push successful!'
+            slackSend channel: '#build-notifications',
+                      color: 'good',
+                      message: "Mediconnect build #${env.BUILD_NUMBER} succeeded! \nImage: ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
         }
         failure {
             echo '❌ Build failed!'
+            slackSend channel: '#build-notifications',
+                      color: 'danger',
+                      message: "Mediconnect build #${env.BUILD_NUMBER} failed! \nCheck Jenkins: ${env.BUILD_URL}"
         }
     }
 }
