@@ -25,14 +25,29 @@ pipeline {
             }
         }
 
-              stage('Prepare APK') {
+
+        stage('Prepare APK') {
             steps {
                 bat '''
-                    mkdir ci_output
-                    copy build/app/outputs/flutter-apk/app-release.apk ci_output/
+                    echo "Preparing APK..."
+        
+                    if exist build\\app\\outputs\\flutter-apk\\app-release.apk (
+                        echo "Found APK at flutter-apk path"
+                        mkdir ci_output
+                        copy /Y build\\app\\outputs\\flutter-apk\\app-release.apk ci_output\\
+                    ) else if exist build\\app\\outputs\\apk\\release\\app-release.apk (
+                        echo "Found APK at alternate apk/release path"
+                        mkdir ci_output
+                        copy /Y build\\app\\outputs\\apk\\release\\app-release.apk ci_output\\
+                    ) else (
+                        echo "❌ APK not found in expected locations!"
+                        dir build\\app\\outputs
+                        exit /b 1
+                    )
                 '''
             }
-        }
+}
+
 
         stage('Build Docker Image') {
             steps {
