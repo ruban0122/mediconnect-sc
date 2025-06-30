@@ -25,11 +25,11 @@ pipeline {
             }
         }
 
-        stage('Prepare APK') {
+              stage('Prepare APK') {
             steps {
-                bat '''
+                sh '''
                     mkdir ci_output
-                    copy /Y build\\app\\outputs\\flutter-apk\\app-release.apk ci_output\\
+                    copy build/app/outputs/flutter-apk/app-release.apk ci_output/
                 '''
             }
         }
