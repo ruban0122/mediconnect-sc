@@ -1,33 +1,12 @@
-# ============================
-# Stage 1: Build Flutter Web
-# ============================
-FROM cirrusci/flutter:latest AS build
+# Dockerfile (option 1 - package only)
+FROM debian:bullseye-slim
 
+# Set working directory
 WORKDIR /app
 
-# Copy project files
-COPY . .
+# Copy release APK into image
+COPY ci_output/app-release.apk .
 
-# Get dependencies
-RUN flutter pub get
+# Optionally expose the APK path or define CMD if running container
+CMD ["echo", "APK copied into image. Use docker cp to extract."]
 
-# Build the Flutter web app
-RUN flutter build web
-
-
-# =============================
-# Stage 2: Serve with Nginx
-# =============================
-FROM nginx:alpine
-
-# Remove default nginx config
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy built web app to Nginx's web directory
-COPY --from=build /app/build/web /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
