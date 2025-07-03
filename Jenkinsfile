@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        JIRA_SITE = 'sc-section4-g06' // MUST match the Jira site name in Jenkins config
+        JIRA_SITE = 'https://sc-section4-g06.atlassian.net'
     }
 
     stages {
         stage('Build') {
             steps {
-                echo 'Building project...'
+                echo 'Running build...'
             }
         }
 
