@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    environment {
-        JIRA_SITE = 'https://sc-section4-g06.atlassian.net'
-    }
+environment {
+    JIRA_SITE = 'https://sc-section4-g06.atlassian.net'
+}
 
     stages {
         stage('Build') {
