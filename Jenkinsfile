@@ -63,7 +63,7 @@ pipeline {
         stage('Update Jira Issue') {
             steps {
                 script {
-                    def issueKey = 'KAN-7'
+                    def issueKey = 'KAN-8'
                     
                     // Add a comment to the issue
                     jiraAddComment (
