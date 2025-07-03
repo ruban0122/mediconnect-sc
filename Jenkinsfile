@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-environment {
-    JIRA_SITE = 'https://sc-section4-g06.atlassian.net'
-}
+    environment {
+        JIRA_SITE = 'Jira'  // must match the Jira "Name" in Jenkins config
+    }
 
     stages {
         stage('Build') {
@@ -16,7 +16,7 @@ environment {
             steps {
                 script {
                     def issueKey = 'KAN-2'
-                    def comment = '✅ Jenkins pipeline ran successfully for mediconnect-sc and updated Jira.'
+                    def comment = '✅ Jenkins pipeline ran successfully and updated Jira.'
                     jiraAddComment idOrKey: issueKey, comment: comment
                 }
             }
